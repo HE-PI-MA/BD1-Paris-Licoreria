@@ -16,6 +16,16 @@ SET CHARACTER SET utf8mb4;
 
 START TRANSACTION;
 
+-- Fechas relativas para que las pruebas funcionen cualquier dia
+SET @fecha_compra1 = DATE_SUB(DATE_ADD(CURDATE(), INTERVAL 10 HOUR), INTERVAL 26 DAY);
+SET @fecha_compra2 = DATE_SUB(DATE_ADD(CURDATE(), INTERVAL 10 HOUR), INTERVAL 12 DAY);
+SET @fecha_apertura = DATE_ADD(CURDATE(), INTERVAL 8 HOUR);
+SET @fecha_venta = DATE_ADD(@fecha_apertura, INTERVAL 30 MINUTE);
+SET @fecha_ajuste = DATE_ADD(@fecha_apertura, INTERVAL 45 MINUTE);
+SET @fecha_cierre = DATE_ADD(@fecha_apertura, INTERVAL 1 HOUR);
+SET @vencimiento_lote1 = DATE_ADD(CURDATE(), INTERVAL 120 DAY);
+SET @vencimiento_lote2 = DATE_ADD(CURDATE(), INTERVAL 180 DAY);
+
 
 -- ============================================================
 -- 1. OBTENER DATOS MAESTROS
@@ -186,7 +196,7 @@ INSERT INTO compra (
 VALUES (
     @proveedor,
     @usuario_admin,
-    '2026-08-01 10:00:00',
+    @fecha_compra1,
     'Primera compra de prueba'
 );
 
@@ -218,7 +228,7 @@ INSERT INTO lote_producto (
 VALUES (
     @detalle_compra1,
     'LOTE-ANTIGUO-001',
-    '2027-01-15',
+    @vencimiento_lote1,
     10
 );
 
@@ -253,7 +263,7 @@ INSERT INTO compra (
 VALUES (
     @proveedor,
     @usuario_admin,
-    '2026-08-15 10:00:00',
+    @fecha_compra2,
     'Segunda compra de prueba'
 );
 
@@ -285,7 +295,7 @@ INSERT INTO lote_producto (
 VALUES (
     @detalle_compra2,
     'LOTE-NUEVO-002',
-    '2027-03-15',
+    @vencimiento_lote2,
     10
 );
 
@@ -325,7 +335,7 @@ INSERT INTO sesion_caja (
 )
 VALUES (
     @usuario_vendedor,
-    '2026-08-27 08:00:00',
+    @fecha_apertura,
     100.00,
     'ABIERTA',
     'Sesión de caja para prueba integral'
@@ -348,7 +358,7 @@ INSERT INTO venta (
 )
 VALUES (
     @sesion,
-    '2026-08-27 08:30:00',
+    @fecha_venta,
     'VIGENTE',
     NULL
 );
@@ -456,7 +466,7 @@ INSERT INTO ajuste_inventario (
 VALUES (
     @lote_ubicacion2,
     @usuario_admin,
-    '2026-08-27 08:45:00',
+    @fecha_ajuste,
     'DAÑADO',
     1,
     'Unidad dañada encontrada durante revisión'
@@ -496,7 +506,7 @@ INSERT INTO arqueo_caja (
 )
 VALUES (
     @sesion,
-    '2026-08-27 09:00:00',
+    @fecha_cierre,
     'Arqueo de prueba sin diferencia'
 );
 
@@ -521,7 +531,7 @@ VALUES (
 
 UPDATE sesion_caja
 SET
-    fecha_hora_cierre = '2026-08-27 09:00:00',
+    fecha_hora_cierre = @fecha_cierre,
     estado = 'CERRADA',
     observacion = 'Sesión cerrada correctamente'
 WHERE id_sesion_caja = @sesion;
@@ -590,6 +600,7 @@ ORDER BY id_pago;
 SELECT
     'FIFO' AS prueba,
     lp.codigo_lote,
+    c_fifo.fecha_hora AS fecha_ingreso_lote,
     lp.fecha_vencimiento,
     dvl.cantidad_base
 FROM detalle_venta_lote dvl
@@ -597,8 +608,12 @@ INNER JOIN lote_ubicacion lu
     ON lu.id_lote_ubicacion = dvl.id_lote_ubicacion
 INNER JOIN lote_producto lp
     ON lp.id_lote = lu.id_lote
+INNER JOIN detalle_compra dc_fifo
+    ON dc_fifo.id_detalle_compra = lp.id_detalle_compra
+INNER JOIN compra c_fifo
+    ON c_fifo.id_compra = dc_fifo.id_compra
 WHERE dvl.id_detalle_venta = @detalle_venta
-ORDER BY lp.fecha_vencimiento;
+ORDER BY c_fifo.fecha_hora, lp.id_lote;
 
 
 -- EFECTIVO ESPERADO

@@ -327,6 +327,7 @@ SELECT
     dv.cantidad AS cantidad_vendida,
     lp.id_lote,
     lp.codigo_lote,
+    c_lote.fecha_hora AS fecha_ingreso_lote,
     lp.fecha_vencimiento,
     u.nombre AS ubicacion,
     dvl.cantidad_base AS cantidad_descontada_base
@@ -351,12 +352,18 @@ INNER JOIN lote_ubicacion lu
 INNER JOIN lote_producto lp
     ON lp.id_lote = lu.id_lote
 
+INNER JOIN detalle_compra dc_lote
+    ON dc_lote.id_detalle_compra = lp.id_detalle_compra
+
+INNER JOIN compra c_lote
+    ON c_lote.id_compra = dc_lote.id_compra
+
 INNER JOIN ubicacion u
     ON u.id_ubicacion = lu.id_ubicacion
 
 ORDER BY
     v.id_venta,
-    lp.fecha_vencimiento,
+    c_lote.fecha_hora,
     lp.id_lote;
 
 

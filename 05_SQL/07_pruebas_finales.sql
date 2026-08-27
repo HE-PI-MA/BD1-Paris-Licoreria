@@ -77,6 +77,7 @@ WHERE producto = 'Cerveza Paceña 330 ml';
 
 SELECT
     lp.codigo_lote,
+    c_lote.fecha_hora AS fecha_ingreso_lote,
     lp.fecha_vencimiento,
     dvl.cantidad_base
 FROM detalle_venta_lote dvl
@@ -84,7 +85,11 @@ INNER JOIN lote_ubicacion lu
     ON lu.id_lote_ubicacion = dvl.id_lote_ubicacion
 INNER JOIN lote_producto lp
     ON lp.id_lote = lu.id_lote
-ORDER BY lp.fecha_vencimiento;
+INNER JOIN detalle_compra dc_lote
+    ON dc_lote.id_detalle_compra = lp.id_detalle_compra
+INNER JOIN compra c_lote
+    ON c_lote.id_compra = dc_lote.id_compra
+ORDER BY c_lote.fecha_hora, lp.id_lote;
 
 
 -- ============================================================

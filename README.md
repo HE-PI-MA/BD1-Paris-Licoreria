@@ -113,7 +113,7 @@ MySQL Community Server 8.0.44
 Desde el cliente MySQL puede ejecutarse todo el proyecto mediante:
 
 ```sql
-SOURCE C:/Users/Usuario/Documents/BD1-Paris-Licoreria/05_SQL/00_ejecutar_todo.sql;
+SOURCE 05_SQL/00_ejecutar_todo.sql;
 ```
 
 El archivo maestro realiza automáticamente:

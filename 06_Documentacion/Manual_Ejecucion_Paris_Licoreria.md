@@ -272,7 +272,7 @@ mysql>
 Ubicado dentro del cliente MySQL, ejecutar:
 
 ```sql
-SOURCE C:/Users/Usuario/Documents/BD1-Paris-Licoreria/05_SQL/00_ejecutar_todo.sql;
+SOURCE 05_SQL/00_ejecutar_todo.sql;
 ```
 
 Este único comando realiza:
@@ -302,19 +302,19 @@ Validación final
 También es posible ejecutar los archivos individualmente:
 
 ```sql
-SOURCE C:/Users/Usuario/Documents/BD1-Paris-Licoreria/05_SQL/01_creacion_bd.sql;
+SOURCE 05_SQL/01_creacion_bd.sql;
 
-SOURCE C:/Users/Usuario/Documents/BD1-Paris-Licoreria/05_SQL/02_creacion_tablas.sql;
+SOURCE 05_SQL/02_creacion_tablas.sql;
 
-SOURCE C:/Users/Usuario/Documents/BD1-Paris-Licoreria/05_SQL/03_datos_iniciales.sql;
+SOURCE 05_SQL/03_datos_iniciales.sql;
 
-SOURCE C:/Users/Usuario/Documents/BD1-Paris-Licoreria/05_SQL/04_vistas.sql;
+SOURCE 05_SQL/04_vistas.sql;
 
-SOURCE C:/Users/Usuario/Documents/BD1-Paris-Licoreria/05_SQL/06_datos_prueba.sql;
+SOURCE 05_SQL/06_datos_prueba.sql;
 
-SOURCE C:/Users/Usuario/Documents/BD1-Paris-Licoreria/05_SQL/05_consultas_prueba.sql;
+SOURCE 05_SQL/05_consultas_prueba.sql;
 
-SOURCE C:/Users/Usuario/Documents/BD1-Paris-Licoreria/05_SQL/07_pruebas_finales.sql;
+SOURCE 05_SQL/07_pruebas_finales.sql;
 ```
 
 ---

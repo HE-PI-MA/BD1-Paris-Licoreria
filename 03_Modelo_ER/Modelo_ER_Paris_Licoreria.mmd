@@ -1,0 +1,24 @@
+erDiagram
+    ROL ||--o{ USUARIO : asigna
+    CATEGORIA ||--o{ PRODUCTO : clasifica
+    UNIDAD_MEDIDA ||--o{ PRODUCTO : mide
+    PRODUCTO ||--o{ PRESENTACION_PRODUCTO : posee
+    PROVEEDOR ||--o{ COMPRA : provee
+    USUARIO ||--o{ COMPRA : registra
+    COMPRA ||--o{ DETALLE_COMPRA : contiene
+    PRESENTACION_PRODUCTO ||--o{ DETALLE_COMPRA : se_compra
+    DETALLE_COMPRA ||--o{ LOTE_PRODUCTO : origina
+    LOTE_PRODUCTO ||--o{ LOTE_UBICACION : se_ubica
+    UBICACION ||--o{ LOTE_UBICACION : contiene
+    LOTE_UBICACION ||--o{ AJUSTE_INVENTARIO : recibe
+    USUARIO ||--o{ AJUSTE_INVENTARIO : registra
+    USUARIO ||--o{ SESION_CAJA : opera
+    SESION_CAJA ||--o{ VENTA : contiene
+    VENTA ||--o{ DETALLE_VENTA : detalla
+    PRESENTACION_PRODUCTO ||--o{ DETALLE_VENTA : se_vende
+    DETALLE_VENTA ||--o{ DETALLE_VENTA_LOTE : consume
+    LOTE_UBICACION ||--o{ DETALLE_VENTA_LOTE : abastece
+    VENTA ||--o{ PAGO : recibe
+    SESION_CAJA ||--o| ARQUEO_CAJA : cierra_con
+    ARQUEO_CAJA ||--o{ DETALLE_ARQUEO : contiene
+    DENOMINACION ||--o{ DETALLE_ARQUEO : contabiliza
