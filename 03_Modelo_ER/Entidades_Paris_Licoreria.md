@@ -8,12 +8,12 @@ El objetivo de esta etapa es determinar qué información necesita almacenar la 
 
 Para cada entidad se analizará:
 
-* Por qué existe.
-* Qué problema resuelve.
-* Su clave primaria.
-* Sus principales atributos.
-* Sus claves foráneas.
-* Sus relaciones con otras entidades.
+- Por qué existe.
+- Qué problema resuelve.
+- Su clave primaria.
+- Sus principales atributos.
+- Sus claves foráneas.
+- Sus relaciones con otras entidades.
 
 La propuesta no busca aumentar artificialmente el número de tablas, sino representar correctamente los procesos reales del negocio y reducir redundancias.
 
@@ -35,8 +35,8 @@ Venta total:
 
 Pago:
 
-* 60 Bs en efectivo.
-* 40 Bs mediante QR.
+- 60 Bs en efectivo.
+- 40 Bs mediante QR.
 
 Por esta razón no se utilizará únicamente una tabla `PAGO_QR`.
 
@@ -95,10 +95,11 @@ Después de analizar los requerimientos se proponen inicialmente las siguientes 
 14. SESION_CAJA
 15. VENTA
 16. DETALLE_VENTA
-17. PAGO
-18. DENOMINACION
-19. ARQUEO_CAJA
-20. DETALLE_ARQUEO
+17. DETALLE_VENTA_LOTE
+18. PAGO
+19. DENOMINACION
+20. ARQUEO_CAJA
+21. DETALLE_ARQUEO
 
 Estas entidades todavía deberán revisarse mediante sus relaciones y cardinalidades antes de considerarse definitivamente aprobadas.
 
@@ -112,8 +113,8 @@ Los trabajadores no tendrán las mismas funciones dentro del sistema.
 
 Inicialmente se identificaron:
 
-* Administrador.
-* Encargado de venta o caja.
+- Administrador.
+- Encargado de venta o caja.
 
 Si se almacenara el nombre del rol directamente en cada usuario se repetiría información.
 
@@ -129,9 +130,9 @@ Permite centralizar los tipos de usuario y relacionar varios usuarios con un mis
 
 ## Atributos propuestos
 
-* id_rol
-* nombre
-* descripcion
+- id_rol
+- nombre
+- descripcion
 
 ## Relación principal
 
@@ -151,10 +152,10 @@ Cada trabajador deberá utilizar su propia cuenta.
 
 Además, necesitamos identificar quién realizó:
 
-* Ventas.
-* Compras.
-* Sesiones de caja.
-* Ajustes de inventario.
+- Ventas.
+- Compras.
+- Sesiones de caja.
+- Ajustes de inventario.
 
 ## Problema que resuelve
 
@@ -166,13 +167,13 @@ Permite identificar y responsabilizar a cada trabajador por las operaciones real
 
 ## Atributos propuestos
 
-* id_usuario
-* id_rol
-* nombre
-* apellido
-* nombre_usuario
-* contrasena
-* estado
+- id_usuario
+- id_rol
+- nombre
+- apellido
+- nombre_usuario
+- contrasena
+- estado
 
 ## Clave foránea
 
@@ -198,11 +199,11 @@ Los productos comercializados pertenecen a diferentes grupos.
 
 Por ejemplo:
 
-* Bebidas alcohólicas.
-* Gaseosas.
-* Dulces.
-* Galletas.
-* Limpieza.
+- Bebidas alcohólicas.
+- Gaseosas.
+- Dulces.
+- Galletas.
+- Limpieza.
 
 ## Problema que resuelve
 
@@ -214,10 +215,10 @@ Evita almacenar repetidamente el nombre de una categoría dentro de cada product
 
 ## Atributos propuestos
 
-* id_categoria
-* nombre
-* descripcion
-* estado
+- id_categoria
+- nombre
+- descripcion
+- estado
 
 ## Relación
 
@@ -237,9 +238,9 @@ No todos los productos se controlan de la misma manera.
 
 Pueden utilizarse unidades como:
 
-* Unidad.
-* Gramo.
-* Kilogramo.
+- Unidad.
+- Gramo.
+- Kilogramo.
 
 Las presentaciones comerciales como caja, paquete o fardo se manejarán mediante `PRESENTACION_PRODUCTO`.
 
@@ -253,9 +254,9 @@ Permite identificar correctamente la unidad base utilizada para controlar las ex
 
 ## Atributos propuestos
 
-* id_unidad_medida
-* nombre
-* abreviatura
+- id_unidad_medida
+- nombre
+- abreviatura
 
 ## Relación
 
@@ -281,13 +282,13 @@ Permite almacenar la información general de cada producto una sola vez.
 
 ## Atributos propuestos
 
-* id_producto
-* id_categoria
-* id_unidad_medida
-* nombre
-* descripcion
-* stock_minimo
-* estado
+- id_producto
+- id_categoria
+- id_unidad_medida
+- nombre
+- descripcion
+- stock_minimo
+- estado
 
 ## Claves foráneas
 
@@ -323,15 +324,15 @@ Ejemplo:
 
 Coca Cola:
 
-* Unidad.
-* Paquete.
-* Caja.
+- Unidad.
+- Paquete.
+- Caja.
 
 Cada forma de venta puede tener:
 
-* Precio diferente.
-* Código de barras diferente.
-* Cantidad equivalente diferente.
+- Precio diferente.
+- Código de barras diferente.
+- Cantidad equivalente diferente.
 
 ## Problema que resuelve
 
@@ -343,13 +344,13 @@ Evita crear un producto diferente para cada presentación comercial.
 
 ## Atributos propuestos
 
-* id_presentacion
-* id_producto
-* nombre_presentacion
-* factor_conversion
-* codigo_barras
-* precio_venta
-* estado
+- id_presentacion
+- id_producto
+- nombre_presentacion
+- factor_conversion
+- codigo_barras
+- precio_venta
+- estado
 
 ## Clave foránea
 
@@ -405,12 +406,12 @@ Permite conservar de manera organizada la información de los proveedores.
 
 ## Atributos propuestos
 
-* id_proveedor
-* nombre
-* contacto
-* telefono
-* direccion
-* estado
+- id_proveedor
+- nombre
+- contacto
+- telefono
+- direccion
+- estado
 
 ## Relación
 
@@ -450,11 +451,11 @@ Permite almacenar los datos generales de cada operación de compra.
 
 ## Atributos propuestos
 
-* id_compra
-* id_proveedor
-* id_usuario
-* fecha_hora
-* observacion
+- id_compra
+- id_proveedor
+- id_usuario
+- fecha_hora
+- observacion
 
 ## Claves foráneas
 
@@ -500,11 +501,11 @@ Permite registrar los productos adquiridos dentro de cada compra.
 
 ## Atributos propuestos
 
-* id_detalle_compra
-* id_compra
-* id_presentacion
-* cantidad
-* costo_unitario
+- id_detalle_compra
+- id_compra
+- id_presentacion
+- cantidad
+- costo_unitario
 
 ## Claves foráneas
 
@@ -548,11 +549,11 @@ Permite distinguir físicamente diferentes ingresos de mercadería del mismo pro
 
 ## Atributos propuestos
 
-* id_lote
-* id_detalle_compra
-* codigo_lote
-* fecha_vencimiento
-* cantidad_inicial
+- id_lote
+- id_detalle_compra
+- codigo_lote
+- fecha_vencimiento
+- cantidad_inicial
 
 ## Clave foránea
 
@@ -570,11 +571,11 @@ Porque todo lote ingresado debe poder rastrearse hasta la compra mediante la cua
 
 Desde `DETALLE_COMPRA` también podemos determinar:
 
-* Qué presentación se compró.
-* Qué producto corresponde.
-* Qué costo tuvo.
-* Qué proveedor lo suministró.
-* Cuándo se realizó la compra.
+- Qué presentación se compró.
+- Qué producto corresponde.
+- Qué costo tuvo.
+- Qué proveedor lo suministró.
+- Cuándo se realizó la compra.
 
 ## Relación
 
@@ -592,10 +593,10 @@ Los productos pueden encontrarse en diferentes lugares.
 
 Por ejemplo:
 
-* Refrigerador.
-* Estante.
-* Vitrina.
-* Almacén.
+- Refrigerador.
+- Estante.
+- Vitrina.
+- Almacén.
 
 ## Problema que resuelve
 
@@ -607,10 +608,10 @@ Permite identificar las áreas físicas donde se guarda la mercadería.
 
 ## Atributos propuestos
 
-* id_ubicacion
-* nombre
-* descripcion
-* estado
+- id_ubicacion
+- nombre
+- descripcion
+- estado
 
 ---
 
@@ -656,10 +657,10 @@ La entidad `LOTE_UBICACION` resuelve esa relación muchos a muchos.
 
 ## Atributos propuestos
 
-* id_lote_ubicacion
-* id_lote
-* id_ubicacion
-* cantidad_actual
+- id_lote_ubicacion
+- id_lote
+- id_ubicacion
+- cantidad_actual
 
 ## Claves foráneas
 
@@ -683,9 +684,9 @@ El stock por ubicación también puede calcularse utilizando esta entidad.
 
 Por ello ya no necesitamos mantener simultáneamente:
 
-* stock en PRODUCTO
-* stock por PRODUCTO_UBICACION
-* stock por LOTE
+- stock en PRODUCTO
+- stock por PRODUCTO_UBICACION
+- stock por LOTE
 
 con valores repetidos.
 
@@ -699,10 +700,10 @@ Las existencias no disminuyen únicamente mediante ventas.
 
 También pueden existir:
 
-* Productos dañados.
-* Productos perdidos.
-* Productos vencidos.
-* Ajustes manuales justificados.
+- Productos dañados.
+- Productos perdidos.
+- Productos vencidos.
+- Ajustes manuales justificados.
 
 Necesitamos conservar la causa de esas disminuciones.
 
@@ -716,13 +717,13 @@ Evita modificar simplemente una cantidad sin saber por qué cambió.
 
 ## Atributos propuestos
 
-* id_ajuste
-* id_lote_ubicacion
-* id_usuario
-* fecha_hora
-* tipo_ajuste
-* cantidad
-* observacion
+- id_ajuste
+- id_lote_ubicacion
+- id_usuario
+- fecha_hora
+- tipo_ajuste
+- cantidad
+- observacion
 
 ## Claves foráneas
 
@@ -732,10 +733,10 @@ Evita modificar simplemente una cantidad sin saber por qué cambió.
 
 ## Ejemplos de tipo de ajuste
 
-* DAÑADO
-* PERDIDO
-* VENCIDO
-* OTRO
+- DAÑADO
+- PERDIDO
+- VENCIDO
+- OTRO
 
 ## Relaciones
 
@@ -763,13 +764,13 @@ Evita manejar todas las operaciones del día como si pertenecieran a una única 
 
 ## Atributos propuestos
 
-* id_sesion_caja
-* id_usuario
-* fecha_hora_apertura
-* monto_inicial
-* fecha_hora_cierre
-* estado
-* observacion
+- id_sesion_caja
+- id_usuario
+- fecha_hora_apertura
+- monto_inicial
+- fecha_hora_cierre
+- estado
+- observacion
 
 ## Clave foránea
 
@@ -807,11 +808,11 @@ Permite almacenar la información general de cada transacción comercial.
 
 ## Atributos propuestos
 
-* id_venta
-* id_sesion_caja
-* fecha_hora
-* estado
-* motivo_anulacion
+- id_venta
+- id_sesion_caja
+- fecha_hora
+- estado
+- motivo_anulacion
 
 ## Clave foránea
 
@@ -821,8 +822,8 @@ Permite almacenar la información general de cada transacción comercial.
 
 Por ejemplo:
 
-* VIGENTE
-* ANULADA
+- VIGENTE
+- ANULADA
 
 ## Anulación
 
@@ -868,11 +869,11 @@ Permite registrar cada artículo incluido en una venta.
 
 ## Atributos propuestos
 
-* id_detalle_venta
-* id_venta
-* id_presentacion
-* cantidad
-* precio_unitario
+- id_detalle_venta
+- id_venta
+- id_presentacion
+- cantidad
+- precio_unitario
 
 ## Claves foráneas
 
@@ -906,76 +907,92 @@ Puede calcularse mediante:
 
 ---
 
-# 20. PAGO
+# 20. DETALLE_VENTA_LOTE
 
 ## ¿Por qué existe?
 
-Una venta puede pagarse:
+Una misma línea de venta puede necesitar descontar mercadería de uno o varios lotes.
 
-* En efectivo.
-* Mediante QR.
-* Utilizando una combinación de ambos.
+Esto ocurre especialmente cuando se aplica el criterio FIFO.
 
-## Problema de la propuesta anterior
+Ejemplo:
 
-Anteriormente se planteó únicamente:
+Una venta requiere 5 unidades.
 
-`PAGO_QR`
+El lote más antiguo tiene solamente 3 unidades disponibles.
 
-Eso funciona para pagos QR, pero complica el pago mixto.
+Entonces:
 
-## Nueva solución
+- 3 unidades deben salir del lote antiguo.
+- 2 unidades deben salir del siguiente lote.
 
-Crear una entidad general:
+Si solamente se registrara la cantidad total en `DETALLE_VENTA`, no sería posible conocer de qué lotes salió realmente la mercadería.
 
-`PAGO`
+## Problema que resuelve
+
+Permite conocer exactamente qué lote y ubicación suministraron la cantidad vendida.
+
+También permite demostrar que el criterio FIFO fue aplicado correctamente.
+
+## Relación original
+
+Existe una relación:
+
+`DETALLE_VENTA N : M LOTE_UBICACION`
+
+Una línea de venta puede consumir existencias de varios lotes o ubicaciones.
+
+Una misma existencia de lote y ubicación puede participar en muchas ventas.
+
+Esta relación se resuelve mediante `DETALLE_VENTA_LOTE`.
 
 ## Clave primaria
 
-`id_pago`
+`id_detalle_venta_lote`
 
 ## Atributos propuestos
 
-* id_pago
-* id_venta
-* metodo_pago
-* monto
-* comprobante_qr
+- id_detalle_venta_lote
+- id_detalle_venta
+- id_lote_ubicacion
+- cantidad_base
 
-## Clave foránea
+## Claves foráneas
 
-`id_venta → VENTA`
+`id_detalle_venta → DETALLE_VENTA`
 
-## Relación
+`id_lote_ubicacion → LOTE_UBICACION`
 
-`VENTA 1 : N PAGO`
+## Cantidad base
 
-## Ejemplo
+`cantidad_base` representa la cantidad real que se descontará del inventario expresada en la unidad base del producto.
 
-Venta:
+Ejemplo:
 
-100 Bs.
+Una caja contiene 24 unidades.
 
-PAGO 1:
+Si se vende:
 
-* Método: EFECTIVO
-* Monto: 60 Bs.
+`1 caja`
 
-PAGO 2:
+y:
 
-* Método: QR
-* Monto: 40 Bs.
-* Comprobante: imagen correspondiente.
+`factor_conversion = 24`
 
-## Regla
+entonces:
 
-La suma de los pagos válidos de una venta deberá coincidir con el total de la venta.
+`cantidad_base = 24 unidades`
 
-## Comprobante QR
+Si esas 24 unidades provienen de dos lotes diferentes, podrán registrarse dos filas:
 
-Será obligatorio únicamente cuando el método utilizado sea QR.
+- Lote anterior: 10 unidades.
+- Lote siguiente: 14 unidades.
 
----
+## Relaciones
+
+`DETALLE_VENTA 1 : N DETALLE_VENTA_LOTE`
+
+`LOTE_UBICACION 1 : N DETALLE_VENTA_LOTE`
 
 # 21. DENOMINACION
 
@@ -985,13 +1002,13 @@ Durante el arqueo se cuentan diferentes billetes y monedas.
 
 Por ejemplo:
 
-* 100 Bs.
-* 50 Bs.
-* 20 Bs.
-* 10 Bs.
-* 5 Bs.
-* 1 Bs.
-* 0.50 Bs.
+- 100 Bs.
+- 50 Bs.
+- 20 Bs.
+- 10 Bs.
+- 5 Bs.
+- 1 Bs.
+- 0.50 Bs.
 
 Si almacenáramos el valor directamente en cada detalle de cada arqueo repetiríamos constantemente la misma información.
 
@@ -1005,15 +1022,15 @@ Centraliza las denominaciones monetarias utilizadas.
 
 ## Atributos propuestos
 
-* id_denominacion
-* valor
-* tipo
-* estado
+- id_denominacion
+- valor
+- tipo
+- estado
 
 ## Ejemplos de tipo
 
-* BILLETE
-* MONEDA
+- BILLETE
+- MONEDA
 
 ## Relación
 
@@ -1037,10 +1054,10 @@ Permite conservar el registro del arqueo realizado para cada sesión.
 
 ## Atributos propuestos
 
-* id_arqueo
-* id_sesion_caja
-* fecha_hora
-* observacion
+- id_arqueo
+- id_sesion_caja
+- fecha_hora
+- observacion
 
 ## Clave foránea
 
@@ -1070,8 +1087,8 @@ El total contado puede calcularse a partir de `DETALLE_ARQUEO`.
 
 El efectivo esperado puede calcularse utilizando:
 
-* Monto inicial.
-* Pagos en efectivo válidos realizados durante la sesión.
+- Monto inicial.
+- Pagos en efectivo válidos realizados durante la sesión.
 
 La diferencia puede calcularse mediante:
 
@@ -1101,10 +1118,10 @@ Esta relación se resuelve mediante `DETALLE_ARQUEO`.
 
 ## Atributos propuestos
 
-* id_detalle_arqueo
-* id_arqueo
-* id_denominacion
-* cantidad
+- id_detalle_arqueo
+- id_arqueo
+- id_denominacion
+- cantidad
 
 ## Claves foráneas
 
@@ -1150,9 +1167,9 @@ Ahora:
 
 `PAGO` permite:
 
-* Efectivo.
-* QR.
-* Pago mixto.
+- Efectivo.
+- QR.
+- Pago mixto.
 
 Por ello resulta más flexible y normalizado.
 
@@ -1208,9 +1225,9 @@ Se propone `AJUSTE_INVENTARIO`.
 
 Los requerimientos indican que deben registrarse productos:
 
-* Dañados.
-* Perdidos.
-* Vencidos.
+- Dañados.
+- Perdidos.
+- Vencidos.
 
 Sin esta entidad solamente modificaríamos una cantidad y perderíamos la explicación de por qué disminuyó el inventario.
 
@@ -1240,9 +1257,9 @@ Separarlos permite reutilizar las denominaciones y mantener una estructura más 
 
 No se necesita porque París Licorería:
 
-* No registra clientes.
-* No vende al fiado.
-* No maneja cuentas por cobrar.
+- No registra clientes.
+- No vende al fiado.
+- No maneja cuentas por cobrar.
 
 ---
 
@@ -1276,9 +1293,9 @@ No se crea todavía porque no se han definido turnos permanentes como registros 
 
 `SESION_CAJA` permite conocer:
 
-* Responsable.
-* Inicio.
-* Fin.
+- Responsable.
+- Inicio.
+- Fin.
 
 ---
 
@@ -1363,13 +1380,13 @@ Después de analizar la entrevista y los requerimientos se propone inicialmente 
 
 La nueva propuesta mejora varios aspectos del planteamiento inicial:
 
-* Permite pagos mixtos mediante `PAGO`.
-* Evita una tabla exclusiva para QR.
-* Controla ubicaciones por lote mediante `LOTE_UBICACION`.
-* Permite registrar pérdidas y vencimientos mediante `AJUSTE_INVENTARIO`.
-* Evita crear `ENTREGA_CAJA` sin una necesidad confirmada.
-* Permite conservar precios históricos mediante `DETALLE_VENTA` sin crear inicialmente un historial independiente.
-* Evita duplicar innecesariamente información de stock.
-* Mantiene separados los encabezados y detalles de compras, ventas y arqueos.
+- Permite pagos mixtos mediante `PAGO`.
+- Evita una tabla exclusiva para QR.
+- Controla ubicaciones por lote mediante `LOTE_UBICACION`.
+- Permite registrar pérdidas y vencimientos mediante `AJUSTE_INVENTARIO`.
+- Evita crear `ENTREGA_CAJA` sin una necesidad confirmada.
+- Permite conservar precios históricos mediante `DETALLE_VENTA` sin crear inicialmente un historial independiente.
+- Evita duplicar innecesariamente información de stock.
+- Mantiene separados los encabezados y detalles de compras, ventas y arqueos.
 
 La siguiente etapa será revisar visualmente todas estas relaciones, confirmar sus cardinalidades y construir el modelo entidad-relación en Draw.io.
