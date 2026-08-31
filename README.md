@@ -1,283 +1,133 @@
-# París Licorería - Proyecto de Base de Datos
+# París Licorería V2 — Base de datos operativa
 
-Proyecto académico de diseño e implementación de una base de datos relacional para la gestión de **París Licorería**.
+Base de datos relacional para la gestión de productos, compras, inventario por lote y ubicación, ventas, pagos, sesiones de caja y arqueos de París Licorería.
 
-La solución permite representar los principales procesos del negocio relacionados con productos, inventario, compras, proveedores, lotes, ventas, pagos y control de caja.
+La V2 conserva las **21 tablas** normalizadas hasta 3FN y agrega una capa operativa compatible con **MySQL Community Server 8.0.44**:
 
----
+- 14 vistas.
+- 5 procedimientos transaccionales.
+- 21 triggers de integridad y auditoría.
+- Pruebas positivas y negativas con `SIGNAL SQLSTATE`.
 
-## Objetivo
+## Reglas centrales
 
-Diseñar e implementar una base de datos relacional normalizada hasta **Tercera Forma Normal (3FN)** que permita administrar de forma estructurada las operaciones principales de París Licorería.
+### Unidad base y presentaciones
 
----
+`PRODUCTO.id_unidad_medida` define la unidad en la que se controla el inventario. `PRESENTACION_PRODUCTO.factor_conversion` expresa cuántas unidades base contiene una presentación.
 
-## Funcionalidades contempladas
+| Producto | Unidad base | Presentación | Factor | Operación | Inventario base |
+|---|---|---|---:|---:|---:|
+| Cerveza | unidad | Caja de 24 | 24 | compra 2 cajas | 48 unidades |
+| Maní | gramo | Kilogramo | 1000 | venta 0.250 kg | 250 gramos |
+| Maní | gramo | Libra | 453.592 | compra 1 libra | 453.592 gramos |
 
-- Gestión de usuarios y roles.
-- Gestión de categorías y productos.
-- Diferentes presentaciones comerciales.
-- Códigos de barras.
-- Control de precios.
-- Registro de proveedores.
-- Registro de compras.
-- Control de lotes.
-- Fechas de vencimiento.
-- Múltiples ubicaciones de inventario.
-- Control de stock y stock mínimo.
-- Ajustes por daño, pérdida o vencimiento.
-- Registro de ventas.
-- Historial del precio vendido.
-- Pagos en efectivo.
-- Pagos mediante QR.
-- Pagos mixtos.
-- Sesiones de caja.
-- Arqueos de caja.
-- Control de diferencias.
-- Trazabilidad de inventario mediante FIFO.
-- Consultas y reportes.
+Semántica de cantidades:
 
----
+- `DETALLE_COMPRA.cantidad`: presentaciones compradas.
+- `DETALLE_VENTA.cantidad`: presentaciones vendidas.
+- `LOTE_PRODUCTO.cantidad_inicial`: unidades base recibidas.
+- `LOTE_UBICACION.cantidad_actual`: unidades base físicamente existentes.
+- `DETALLE_VENTA_LOTE.cantidad_base`: unidades base descontadas.
 
-## Modelo de datos
+### Stock físico, disponible y vencido
 
-La implementación física está compuesta por **21 tablas**:
+- **Stock físico:** toda existencia presente, incluso vencida.
+- **Stock disponible:** existencia positiva de lotes sin vencimiento o con fecha posterior a hoy.
+- **Stock vencido:** existencia cuyo vencimiento ya fue alcanzado.
 
-1. `ROL`
-2. `USUARIO`
-3. `CATEGORIA`
-4. `UNIDAD_MEDIDA`
-5. `PRODUCTO`
-6. `PRESENTACION_PRODUCTO`
-7. `PROVEEDOR`
-8. `COMPRA`
-9. `DETALLE_COMPRA`
-10. `LOTE_PRODUCTO`
-11. `UBICACION`
-12. `LOTE_UBICACION`
-13. `AJUSTE_INVENTARIO`
-14. `SESION_CAJA`
-15. `VENTA`
-16. `DETALLE_VENTA`
-17. `DETALLE_VENTA_LOTE`
-18. `PAGO`
-19. `DENOMINACION`
-20. `ARQUEO_CAJA`
-21. `DETALLE_ARQUEO`
+Un lote vencido se conserva físicamente y aparece en reportes, pero los triggers y `sp_registrar_venta` impiden venderlo. Se retira mediante `sp_registrar_ajuste_inventario` con tipo `VENCIDO`.
 
-El modelo fue normalizado hasta **3FN**.
+### Operaciones atómicas
 
----
+- `sp_registrar_compra`: registra compra, detalle, lote y ubicación aplicando `cantidad × factor_conversion`.
+- `sp_registrar_venta`: valida caja, presentaciones, stock y pagos; bloquea lotes con `FOR UPDATE`; aplica FIFO; confirma todo o revierte todo.
+- `sp_anular_venta`: devuelve exactamente el stock registrado en `DETALLE_VENTA_LOTE`, conserva detalles y pagos, y evita una segunda anulación.
+- `sp_registrar_ajuste_inventario`: retira inventario sin permitir existencias negativas.
+- `sp_cerrar_sesion_caja`: cierra la sesión y registra el arqueo dentro de una transacción.
 
-## Organización del repositorio
+Los lotes de una venta se ordenan por fecha de compra, `id_lote` e `id_lote_ubicacion`. El trigger de `DETALLE_VENTA_LOTE` verifica además que lote y venta correspondan al mismo producto.
+
+## Organización
 
 ```text
 BD1-Paris-Licoreria/
-│
 ├── 01_Entrevista/
-│
 ├── 02_Requerimientos/
-│
 ├── 03_Modelo_ER/
-│
 ├── 04_Modelo_Relacional/
-│
 ├── 05_SQL/
 │   ├── 00_ejecutar_todo.sql
 │   ├── 01_creacion_bd.sql
 │   ├── 02_creacion_tablas.sql
+│   ├── 03_rutinas.sql
 │   ├── 03_datos_iniciales.sql
 │   ├── 04_vistas.sql
 │   ├── 05_consultas_prueba.sql
 │   ├── 06_datos_prueba.sql
 │   └── 07_pruebas_finales.sql
-│
-├── 06_Documentacion/
-│   ├── Diccionario_Datos_Paris_Licoreria.md
-│   ├── Manual_Ejecucion_Paris_Licoreria.md
-│   └── Informe_Final_Paris_Licoreria.md
-│
-└── README.md
+└── 06_Documentacion/
 ```
 
----
-
-## Ejecución de la base de datos
-
-La implementación fue validada utilizando:
+El archivo maestro ejecuta:
 
 ```text
-MySQL Community Server 8.0.44
+Base → tablas y CHECK/FK → triggers/procedimientos → vistas
+     → datos iniciales → escenario V2 → assertions finales
 ```
 
-Desde el cliente MySQL puede ejecutarse todo el proyecto mediante:
+## Reconstrucción
+
+Desde la raíz del repositorio, abrir el cliente sin escribir la contraseña en el comando:
+
+```powershell
+& "C:\Program Files\MySQL\MySQL Server 8.0\bin\mysql.exe" --default-character-set=utf8mb4 -u root -p
+```
+
+MySQL solicitará la contraseña de forma interactiva. Después ejecutar:
 
 ```sql
 SOURCE 05_SQL/00_ejecutar_todo.sql;
 ```
 
-El archivo maestro realiza automáticamente:
+El script elimina y recrea `paris_licoreria`. Solo si todas las assertions pasan muestra:
 
 ```text
-Creación de la base
-        ↓
-Creación de tablas
-        ↓
-Aplicación de restricciones
-        ↓
-Carga de datos iniciales
-        ↓
-Creación de vistas
-        ↓
-Carga de datos de prueba
-        ↓
-Consultas
-        ↓
-Validación final
+BASE DE DATOS PARÍS LICORERÍA V2 VALIDADA
 ```
 
-> El archivo de ejecución completa recrea la base `paris_licoreria` y carga un escenario destinado a pruebas académicas.
+Las pruebas cubren conversiones de cajas, kilogramos y libras; cantidades decimales; FIFO; vencimientos; pagos completos y mixtos; caja cerrada; stock negativo; ajustes; anulación y arqueo.
 
----
+## Contratos JSON principales
 
-## Control de inventario
+Ejemplo de detalle para `sp_registrar_compra`:
 
-El stock actual no se almacena directamente en `PRODUCTO`.
-
-Se calcula utilizando las existencias registradas en:
-
-```text
-LOTE_UBICACION
+```json
+{
+  "id_presentacion": 1,
+  "cantidad": 2.000,
+  "costo_unitario": 180.00,
+  "codigo_lote": "LOTE-001",
+  "fecha_vencimiento": "2027-12-31",
+  "id_ubicacion": 1
+}
 ```
 
-Esto permite controlar cantidades por lote y por ubicación física.
+Ejemplo de venta:
 
----
-
-## FIFO
-
-La trazabilidad de las ventas se conserva mediante:
-
-```text
-DETALLE_VENTA
-        ↓
-DETALLE_VENTA_LOTE
-        ↓
-LOTE_UBICACION
-        ↓
-LOTE_PRODUCTO
+```json
+{
+  "detalles": [{"id_presentacion": 1, "cantidad": 0.250}],
+  "pagos": [
+    {"metodo_pago": "EFECTIVO", "monto": 5.00},
+    {"metodo_pago": "QR", "monto": 10.00, "comprobante_qr": "ruta/archivo.png"}
+  ]
+}
 ```
 
-Durante la prueba integral se utilizaron dos lotes:
+La suma de pagos debe coincidir exactamente con el total. Los pagos de ventas anuladas permanecen como historial, pero no integran el efectivo esperado.
 
-```text
-LOTE-ANTIGUO-001 → 10 unidades
-LOTE-NUEVO-002   → 2 unidades
-```
+## Códigos de barras y seguridad
 
-para atender una venta de 12 unidades.
+`PRESENTACION_PRODUCTO.codigo_barras` continúa como `VARCHAR(50)` y `UNIQUE` cuando no es `NULL`. Admite EAN-13, EAN-8, UPC con ceros iniciales y códigos internos alfanuméricos.
 
----
-
-## Pagos mixtos
-
-Una venta puede poseer varios registros en `PAGO`.
-
-Ejemplo utilizado durante las pruebas:
-
-```text
-Total venta = 144 Bs
-
-EFECTIVO = 100 Bs
-QR       = 44 Bs
-```
-
-Resultado:
-
-```text
-Total pagado = 144 Bs
-Diferencia   = 0 Bs
-```
-
----
-
-## Prueba de caja
-
-La validación integral produjo:
-
-```text
-Monto inicial      = 100 Bs
-Efectivo recibido  = 100 Bs
-Efectivo esperado  = 200 Bs
-Efectivo contado   = 200 Bs
-Diferencia         = 0 Bs
-Resultado          = CUADRA
-```
-
----
-
-## Resultados de validación
-
-La prueba final confirmó:
-
-```text
-21 tablas                 OK
-11 vistas                 OK
-UTF-8                     OK
-Compras                   OK
-Inventario                OK
-Stock mínimo              OK
-FIFO                      OK
-Venta                     OK
-Pago mixto                OK
-Ajuste de inventario      OK
-Sesión de caja            OK
-Arqueo                    OK
-Existencias negativas     0
-Diferencia de pagos       0
-Diferencia de caja        0
-```
-
-Resultado final:
-
-```text
-BASE DE DATOS PARÍS LICORERÍA VALIDADA
-```
-
----
-
-## Tecnologías utilizadas
-
-- MySQL 8.0
-- SQL
-- Mermaid
-- Draw.io
-- Markdown
-- Visual Studio Code
-- PowerShell
-- Git
-- GitHub
-
----
-
-## Documentación
-
-La documentación detallada se encuentra en:
-
-```text
-06_Documentacion/
-```
-
-Incluye:
-
-- Diccionario de datos.
-- Manual de ejecución.
-- Informe final.
-
----
-
-## Estado del proyecto
-
-**Proyecto de Base de Datos 1 completado y validado.**
-
-La estructura se encuentra preparada para servir posteriormente como base de un sistema de gestión para París Licorería.
+El repositorio no contiene contraseñas reales. Los valores de demostración representan hashes no utilizables; la aplicación futura deberá producir hashes seguros y conceder a su usuario SQL permisos para ejecutar las rutinas necesarias.

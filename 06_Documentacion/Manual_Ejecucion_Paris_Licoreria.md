@@ -1,576 +1,269 @@
-# Manual de Ejecución - París Licorería
+# Manual de Ejecución V2 — París Licorería
 
-## 1. Introducción
+## 1. Requisitos
 
-El presente manual describe el procedimiento necesario para crear, cargar, probar y validar la base de datos desarrollada para París Licorería.
-
-La implementación fue realizada y validada utilizando MySQL Community Server 8.0.
-
----
-
-# 2. Requisitos
-
-Para ejecutar el proyecto se requiere:
-
-- MySQL Server 8.0 o superior.
+- MySQL Community Server 8.0.44.
 - Cliente de línea de comandos de MySQL.
-- Visual Studio Code u otro editor de texto.
-- Usuario de MySQL con permisos para crear bases de datos.
-- Codificación UTF-8.
+- Usuario con permisos para crear la base, tablas, vistas, procedimientos y triggers.
+- Consola configurada para UTF-8.
 
-La versión utilizada durante las pruebas fue:
+No se debe guardar ninguna contraseña en archivos, comandos, Git o documentación.
 
-```text
-MySQL Community Server 8.0.44
-```
+## 2. Advertencia
 
----
+`05_SQL/00_ejecutar_todo.sql` ejecuta `DROP DATABASE IF EXISTS paris_licoreria`. Su propósito es reconstruir y probar el esquema desde cero; elimina cualquier dato previo de esa base.
 
-# 3. Base de datos
-
-Nombre de la base:
-
-```text
-paris_licoreria
-```
-
-Juego de caracteres:
-
-```text
-utf8mb4
-```
-
-Intercalación:
-
-```text
-utf8mb4_unicode_ci
-```
-
-La utilización de `utf8mb4` permite almacenar correctamente caracteres como:
-
-```text
-á é í ó ú ñ
-```
-
----
-
-# 4. Organización de los scripts SQL
-
-Los archivos se encuentran dentro de la carpeta:
+## 3. Archivos
 
 ```text
 05_SQL/
+├── 00_ejecutar_todo.sql       maestro
+├── 01_creacion_bd.sql         base y utf8mb4
+├── 02_creacion_tablas.sql     21 tablas, FK, UNIQUE, CHECK e índices
+├── 03_rutinas.sql             5 procedimientos y 21 triggers
+├── 04_vistas.sql              14 vistas
+├── 03_datos_iniciales.sql     catálogos iniciales
+├── 06_datos_prueba.sql        escenario V2
+├── 07_pruebas_finales.sql     assertions positivas y negativas
+└── 05_consultas_prueba.sql    consultas manuales opcionales
 ```
 
-La estructura es:
+El orden del archivo maestro es:
 
 ```text
-05_SQL/
-│
-├── 00_ejecutar_todo.sql
-├── 01_creacion_bd.sql
-├── 02_creacion_tablas.sql
-├── 03_datos_iniciales.sql
-├── 04_vistas.sql
-├── 05_consultas_prueba.sql
-├── 06_datos_prueba.sql
-└── 07_pruebas_finales.sql
+Base
+  ↓
+Tablas y restricciones
+  ↓
+Triggers y procedimientos
+  ↓
+Vistas
+  ↓
+Datos iniciales
+  ↓
+Escenario de prueba
+  ↓
+Assertions finales
 ```
 
----
+## 4. Abrir MySQL sin exponer la contraseña
 
-# 5. Descripción de los archivos
-
-## 5.1. 00_ejecutar_todo.sql
-
-Es el archivo maestro del proyecto.
-
-Ejecuta automáticamente los demás scripts en el orden correspondiente.
-
-Permite reconstruir y validar completamente la base de datos.
-
-> Importante: el proceso recrea la base de datos `paris_licoreria`. Por lo tanto, los datos existentes en esa base serán reemplazados por el escenario definido en los scripts.
-
----
-
-## 5.2. 01_creacion_bd.sql
-
-Realiza las siguientes operaciones:
-
-```text
-Eliminar la base anterior si existe
-        ↓
-Crear paris_licoreria
-        ↓
-Configurar utf8mb4
-        ↓
-Seleccionar la base
-```
-
----
-
-## 5.3. 02_creacion_tablas.sql
-
-Crea las 21 tablas del modelo físico.
-
-También define:
-
-- Claves primarias.
-- Claves foráneas.
-- Restricciones UNIQUE.
-- Restricciones CHECK.
-- Relaciones entre tablas.
-- Reglas de integridad.
-
----
-
-## 5.4. 03_datos_iniciales.sql
-
-Carga los datos maestros necesarios para iniciar el sistema.
-
-Incluye:
-
-```text
-Roles
-Unidades de medida
-Categorías
-Ubicaciones
-Denominaciones monetarias
-```
-
----
-
-## 5.5. 04_vistas.sql
-
-Crea 11 vistas destinadas a facilitar consultas y reportes.
-
-Las vistas implementadas son:
-
-```text
-vw_stock_producto
-vw_productos_stock_bajo
-vw_stock_lote_ubicacion
-vw_lotes_proximos_vencer
-vw_compras_totales
-vw_ventas_totales
-vw_pagos_venta
-vw_productos_mas_vendidos
-vw_efectivo_esperado_sesion
-vw_efectivo_contado_arqueo
-vw_diferencias_caja
-```
-
----
-
-## 5.6. 05_consultas_prueba.sql
-
-Contiene consultas destinadas a comprobar el funcionamiento de la información almacenada.
-
-Permite consultar, entre otros aspectos:
-
-```text
-Productos
-Presentaciones
-Stock
-Stock bajo
-Lotes
-Vencimientos
-Compras
-Ventas
-Ventas diarias
-Ventas semanales
-Ventas mensuales
-Productos más vendidos
-Formas de pago
-Pagos mixtos
-Ventas anuladas
-Sesiones de caja
-Diferencias de caja
-Ajustes de inventario
-Trazabilidad FIFO
-Validación de pagos
-```
-
----
-
-## 5.7. 06_datos_prueba.sql
-
-Carga un escenario controlado para demostrar el funcionamiento integral del modelo.
-
-La prueba contiene:
-
-```text
-2 usuarios
-1 proveedor
-1 producto
-1 presentación
-2 compras
-2 lotes
-1 sesión de caja
-1 venta
-2 formas de pago
-1 ajuste de inventario
-1 arqueo de caja
-```
-
-También demuestra la utilización del criterio FIFO.
-
----
-
-## 5.8. 07_pruebas_finales.sql
-
-Ejecuta verificaciones automáticas sobre la base.
-
-Comprueba:
-
-```text
-Cantidad de tablas
-Cantidad de vistas
-Codificación UTF-8
-Stock
-FIFO
-Total de venta
-Total pagado
-Pagos mixtos
-Existencias negativas
-Arqueo de caja
-Ajustes de inventario
-```
-
----
-
-# 6. Abrir MySQL desde PowerShell
-
-Desde PowerShell se recomienda utilizar la página de códigos UTF-8.
-
-Ejecutar:
+En PowerShell, desde la raíz del repositorio:
 
 ```powershell
 chcp 65001
-```
-
-Después iniciar el cliente de MySQL:
-
-```powershell
 & "C:\Program Files\MySQL\MySQL Server 8.0\bin\mysql.exe" --default-character-set=utf8mb4 -u root -p
 ```
 
-MySQL solicitará la contraseña del usuario.
+La opción `-p` sin valor hace que MySQL solicite la contraseña de forma interactiva. No la escriba dentro del comando.
 
-La contraseña no se incluye en ningún archivo del repositorio.
+## 5. Reconstrucción completa
 
-Cuando el acceso sea correcto aparecerá:
-
-```text
-mysql>
-```
-
----
-
-# 7. Ejecución completa recomendada
-
-Ubicado dentro del cliente MySQL, ejecutar:
+Dentro del cliente MySQL:
 
 ```sql
 SOURCE 05_SQL/00_ejecutar_todo.sql;
 ```
 
-Este único comando realiza:
+Solo si todas las pruebas pasan se muestra:
 
 ```text
-Creación de la base
-        ↓
-Creación de 21 tablas
-        ↓
-Aplicación de restricciones
-        ↓
-Carga de datos iniciales
-        ↓
-Creación de 11 vistas
-        ↓
-Carga de datos de prueba
-        ↓
-Ejecución de consultas
-        ↓
-Validación final
+BASE DE DATOS PARÍS LICORERÍA V2 VALIDADA
 ```
 
----
+Si una assertion falla, `SIGNAL SQLSTATE '45000'` aborta el procedimiento de pruebas antes de emitir ese mensaje.
 
-# 8. Ejecución manual por etapas
+Para demostrar reproducibilidad, salir y ejecutar el archivo maestro una segunda vez.
 
-También es posible ejecutar los archivos individualmente:
+## 6. Ejecución por etapas
 
 ```sql
 SOURCE 05_SQL/01_creacion_bd.sql;
-
 SOURCE 05_SQL/02_creacion_tablas.sql;
-
-SOURCE 05_SQL/03_datos_iniciales.sql;
-
+SOURCE 05_SQL/03_rutinas.sql;
 SOURCE 05_SQL/04_vistas.sql;
-
+SOURCE 05_SQL/03_datos_iniciales.sql;
 SOURCE 05_SQL/06_datos_prueba.sql;
-
-SOURCE 05_SQL/05_consultas_prueba.sql;
-
 SOURCE 05_SQL/07_pruebas_finales.sql;
 ```
 
----
-
-# 9. Validación de la estructura
-
-La prueba final debe indicar:
-
-```text
-cantidad_tablas = 21
-resultado = OK
-```
-
-y:
-
-```text
-cantidad_vistas = 11
-resultado = OK
-```
-
-Esto comprueba que la estructura física fue creada completamente.
-
----
-
-# 10. Validación UTF-8
-
-Durante las pruebas se verificaron textos como:
-
-```text
-Bebidas alcohólicas
-Almacén
-```
-
-El valor hexadecimal almacenado confirmó que los caracteres se encuentran correctamente codificados en UTF-8.
-
----
-
-# 11. Escenario de inventario
-
-La prueba utiliza un producto:
-
-```text
-Cerveza Paceña 330 ml
-```
-
-Se ingresan dos lotes:
-
-```text
-LOTE-ANTIGUO-001 = 10 unidades
-LOTE-NUEVO-002   = 10 unidades
-```
-
-Stock inicial:
-
-```text
-20 unidades
-```
-
----
-
-# 12. Prueba FIFO
-
-Se realiza una venta de:
-
-```text
-12 unidades
-```
-
-La trazabilidad registrada es:
-
-```text
-LOTE-ANTIGUO-001 → 10 unidades
-LOTE-NUEVO-002   → 2 unidades
-```
-
-Esto demuestra que se utilizaron primero las existencias correspondientes al lote más antiguo.
-
----
-
-# 13. Prueba de ajuste de inventario
-
-Después de la venta se registra:
-
-```text
-1 unidad dañada
-```
-
-El cálculo del inventario resulta:
-
-```text
-20 unidades iniciales
--12 unidades vendidas
--1 unidad dañada
----------------------
-7 unidades finales
-```
-
-Como el stock mínimo configurado es:
-
-```text
-10 unidades
-```
-
-el sistema determina:
-
-```text
-STOCK BAJO
-```
-
----
-
-# 14. Prueba de venta
-
-La venta utilizada en el escenario contiene:
-
-```text
-Cantidad = 12 unidades
-Precio unitario = 12 Bs
-```
-
-Total:
-
-```text
-12 × 12 = 144 Bs
-```
-
-Resultado de validación:
-
-```text
-total_venta = 144
-resultado = OK
-```
-
----
-
-# 15. Prueba de pago mixto
-
-La venta de 144 Bs se paga mediante:
-
-```text
-EFECTIVO = 100 Bs
-QR       = 44 Bs
-```
-
-Total pagado:
-
-```text
-144 Bs
-```
-
-Diferencia:
-
-```text
-0 Bs
-```
-
-Resultado:
-
-```text
-OK
-```
-
----
-
-# 16. Prueba de caja
-
-La sesión se abre con:
-
-```text
-Monto inicial = 100 Bs
-```
-
-Durante la sesión se reciben:
-
-```text
-100 Bs en efectivo
-```
-
-Por lo tanto:
-
-```text
-Efectivo esperado = 200 Bs
-```
-
-Durante el arqueo se cuentan:
-
-```text
-200 Bs
-```
-
-Resultado:
-
-```text
-Efectivo esperado = 200 Bs
-Efectivo contado  = 200 Bs
-Diferencia        = 0 Bs
-Resultado         = CUADRA
-```
-
----
-
-# 17. Validación de stock negativo
-
-La prueba automática comprueba que no existan registros con:
-
-```text
-cantidad_actual < 0
-```
-
-El resultado obtenido fue:
-
-```text
-existencias_negativas = 0
-resultado = OK
-```
-
----
-
-# 18. Resultado final esperado
-
-Cuando toda la ejecución ha sido correcta aparece:
-
-```text
-BASE DE DATOS PARÍS LICORERÍA VALIDADA
-```
-
-Este mensaje indica que las principales verificaciones del escenario de prueba fueron superadas.
-
----
-
-# 19. Salir de MySQL
-
-Para cerrar el cliente:
+Las consultas de exploración son opcionales:
 
 ```sql
-exit;
+SOURCE 05_SQL/05_consultas_prueba.sql;
 ```
 
----
+## 7. Registrar una compra
 
-# 20. Recomendaciones
+Firma:
 
-Los archivos `06_datos_prueba.sql` y `07_pruebas_finales.sql` están destinados a la demostración y validación académica.
+```sql
+CALL sp_registrar_compra(
+    id_proveedor,
+    id_usuario,
+    fecha_hora,
+    observacion,
+    detalles_json,
+    @id_compra
+);
+```
 
-Para utilizar posteriormente la base con datos reales se deberán cargar los usuarios, productos, proveedores, compras y demás operaciones reales del negocio.
+Ejemplo para dos cajas de 24:
 
-No deben almacenarse contraseñas reales en texto plano.
+```sql
+CALL sp_registrar_compra(
+    1,
+    1,
+    CURRENT_TIMESTAMP,
+    'Ingreso de cajas',
+    JSON_ARRAY(JSON_OBJECT(
+        'id_presentacion', 2,
+        'cantidad', 2.000,
+        'costo_unitario', 180.00,
+        'codigo_lote', 'LOTE-001',
+        'fecha_vencimiento', '2027-12-31',
+        'id_ubicacion', 1
+    )),
+    @id_compra
+);
+```
 
-La aplicación que utilice esta base deberá almacenar las contraseñas mediante un algoritmo seguro de hash.
+El procedimiento registra 48 unidades base. Si falla cualquier paso, revierte compra, detalle, lote y ubicación.
 
----
+## 8. Registrar una venta
 
-# 21. Conclusión
+Firma:
 
-La base de datos de París Licorería puede reconstruirse y validarse de forma reproducible mediante los scripts incluidos en el proyecto.
+```sql
+CALL sp_registrar_venta(
+    id_sesion_caja,
+    detalles_json,
+    pagos_json,
+    @id_venta
+);
+```
 
-El archivo `00_ejecutar_todo.sql` facilita la demostración del sistema al ejecutar automáticamente la estructura, los datos iniciales, el escenario de prueba, las consultas y las verificaciones finales.
+Ejemplo de pago mixto:
 
-Las pruebas realizadas confirmaron el correcto funcionamiento de las relaciones, el inventario, los lotes, FIFO, las ventas, los pagos mixtos y el control de caja.
+```sql
+CALL sp_registrar_venta(
+    1,
+    JSON_ARRAY(
+        JSON_OBJECT('id_presentacion', 1, 'cantidad', 12.000)
+    ),
+    JSON_ARRAY(
+        JSON_OBJECT('metodo_pago', 'EFECTIVO', 'monto', 100.00),
+        JSON_OBJECT(
+            'metodo_pago', 'QR',
+            'monto', 44.00,
+            'comprobante_qr', 'comprobantes/venta.png'
+        )
+    ),
+    @id_venta
+);
+```
+
+La rutina:
+
+1. Bloquea la sesión y exige que esté abierta.
+2. Valida presentaciones y productos activos.
+3. Convierte cada cantidad a unidad base.
+4. Busca lotes del mismo producto, no vencidos y con stock.
+5. Los ordena por fecha de compra, lote y ubicación.
+6. Bloquea cada existencia con `FOR UPDATE`.
+7. Registra `DETALLE_VENTA_LOTE` y descuenta inventario.
+8. Conserva el precio histórico.
+9. Exige igualdad exacta entre pagos y total.
+10. Confirma todo o ejecuta `ROLLBACK`.
+
+## 9. Productos por peso
+
+Para maní cuya unidad base es gramo:
+
+```text
+Gramo     factor 1
+Kilogramo factor 1000
+Libra     factor 453.592
+```
+
+Una venta de `0.250` kilogramos descuenta `250.000` gramos. La cantidad monetaria continúa siendo `0.250 × precio_por_kilogramo`.
+
+## 10. Anular una venta
+
+```sql
+CALL sp_anular_venta(@id_venta, 'Motivo obligatorio');
+```
+
+Se bloquea la venta, se devuelve a cada lote exactamente lo consumido, se conserva todo el historial y se marca `ANULADA`. Un segundo intento produce error.
+
+## 11. Ajustar inventario
+
+```sql
+CALL sp_registrar_ajuste_inventario(
+    id_lote_ubicacion,
+    id_usuario,
+    'DAÑADO',
+    1.000,
+    'Botella rota',
+    @id_ajuste
+);
+```
+
+Tipos: `DAÑADO`, `PERDIDO`, `VENCIDO`, `OTRO`. El procedimiento bloquea la existencia y rechaza cantidades superiores al stock. `VENCIDO` requiere una fecha ya alcanzada.
+
+## 12. Cerrar y arquear caja
+
+```sql
+CALL sp_cerrar_sesion_caja(
+    id_sesion,
+    CURRENT_TIMESTAMP,
+    'Arqueo del turno',
+    JSON_ARRAY(
+        JSON_OBJECT('id_denominacion', 1, 'cantidad', 2),
+        JSON_OBJECT('id_denominacion', 2, 'cantidad', 1)
+    ),
+    @id_arqueo
+);
+```
+
+La sesión se cierra y el arqueo se registra en una transacción. Si el efectivo contado difiere del esperado, la observación es obligatoria.
+
+## 13. Consultar inventario
+
+```sql
+SELECT * FROM vw_stock_producto;
+SELECT * FROM vw_stock_fisico_producto;
+SELECT * FROM vw_stock_disponible_producto;
+SELECT * FROM vw_stock_vencido_producto;
+SELECT * FROM vw_stock_lote_ubicacion;
+SELECT * FROM vw_lotes_proximos_vencer;
+```
+
+Un lote con `fecha_vencimiento <= CURRENT_DATE` forma parte del stock físico y vencido, pero no del disponible.
+
+## 14. Pruebas cubiertas
+
+Las assertions verifican:
+
+- 21 tablas, 14 vistas, 5 procedimientos, 21 triggers, FK y CHECK.
+- UTF-8 y códigos con cero inicial.
+- Compra normal y conversiones 24, 1000 y 453.592.
+- Venta decimal de 0.250 kg.
+- FIFO 10 + 2.
+- Stock físico, disponible y vencido.
+- Efectivo, QR y pago mixto.
+- Pago incompleto con rollback.
+- Stock insuficiente y stock negativo.
+- Lote vencido y cruce de productos.
+- Caja cerrada y estados incoherentes.
+- Anulación, devolución exacta y doble anulación.
+- Ajustes `DAÑADO`, `VENCIDO` y exceso de ajuste.
+- Efectivo esperado y arqueo sin diferencia.
+
+## 15. Seguridad y operación futura
+
+- No conceder a la aplicación permisos administrativos sobre el servidor.
+- Usar procedimientos para las operaciones multirow.
+- Producir hashes de contraseña en el backend futuro.
+- Guardar archivos QR fuera de la base y almacenar únicamente su referencia controlada.
+- Programar copias de seguridad antes de utilizar datos reales.

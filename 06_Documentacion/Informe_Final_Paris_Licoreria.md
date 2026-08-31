@@ -1,868 +1,192 @@
-﻿# Informe Final - Base de Datos París Licorería
+# Informe Final V2 — Base de Datos París Licorería
 
-## 1. Introducción
+## 1. Objetivo
 
-El presente proyecto consiste en el análisis, diseño e implementación de una base de datos relacional para París Licorería.
+La V2 convierte el modelo académico normalizado en una base preparada para sustentar posteriormente un sistema real. Conserva las entidades originales y agrega integridad operativa para compras, inventario, ventas, pagos, vencimientos, anulaciones y caja.
 
-El negocio comercializa principalmente bebidas alcohólicas y complementa sus ventas con otros productos como gaseosas, dulces, galletas, artículos de limpieza y diferentes productos de consumo.
+La implementación está orientada exclusivamente a MySQL Community Server 8.0.44. No incluye frontend, backend, lector móvil ni integraciones externas.
 
-Antes del desarrollo del proyecto, gran parte del control operativo se realizaba utilizando papel y lápiz.
+## 2. Estructura final
 
-Esta forma de trabajo dificultaba mantener un control preciso sobre las existencias, las compras, los lotes, las ventas y los cierres de caja.
-
-A partir de esta problemática se desarrolló un modelo de datos orientado a organizar la información del negocio y proporcionar trazabilidad sobre sus operaciones principales.
-
----
-
-# 2. Situación problemática
-
-Durante el análisis del negocio se identificaron diferentes necesidades relacionadas con la administración de la información.
-
-Entre las principales se encontraron:
+El modelo mantiene 21 tablas:
 
 ```text
-Control de usuarios
-Control de productos
-Categorías
-Presentaciones comerciales
-Códigos de barras
-Precios
-Proveedores
-Compras
-Inventario
-Stock mínimo
-Lotes
-Vencimientos
-Ubicaciones
-Ventas
-Pagos
-Pagos mixtos
-Sesiones de caja
-Arqueos
-Daños
-Pérdidas
-Productos vencidos
-Trazabilidad FIFO
-```
-
-La ausencia de una base de datos estructurada hacía difícil obtener información confiable y actualizada de estas operaciones.
-
----
-
-# 3. Objetivo general
-
-Diseñar e implementar una base de datos relacional normalizada para París Licorería que permita representar y controlar sus principales operaciones comerciales, manteniendo integridad, consistencia y trazabilidad de la información.
-
----
-
-# 4. Objetivos específicos
-
-Los objetivos específicos del proyecto fueron:
-
-```text
-Analizar el funcionamiento real del negocio
-Identificar sus requerimientos de información
-Identificar entidades y atributos
-Determinar relaciones y cardinalidades
-Diseñar el Modelo Entidad-Relación
-Transformarlo en un Modelo Relacional
-Aplicar normalización hasta 3FN
-Implementar el modelo en MySQL
-Crear vistas y consultas
-Realizar pruebas integrales
-Documentar la solución
-```
-
----
-
-# 5. Levantamiento de información
-
-El desarrollo comenzó con una entrevista orientada a conocer la forma de trabajo de París Licorería.
-
-Se analizaron procesos relacionados con:
-
-```text
-Productos
-Compras
-Proveedores
-Inventario
-Ventas
-Formas de pago
-Usuarios
-Caja
-Arqueos
-Pérdidas
-Vencimientos
-```
-
-La información obtenida permitió definir posteriormente los requerimientos funcionales y de datos.
-
----
-
-# 6. Roles identificados
-
-Se definieron dos roles principales.
-
-## ADMINISTRADOR
-
-Representa principalmente al propietario o responsable del negocio.
-
-Entre sus funciones se encuentran:
-
-```text
-Administrar productos
-Administrar categorías
-Administrar proveedores
-Registrar compras
-Administrar precios
-Revisar inventario
-Revisar ventas
-Revisar cierres de caja
-Consultar reportes
-Administrar usuarios
-```
-
-## ENCARGADO_VENTA
-
-Representa al trabajador encargado de realizar ventas y manejar caja.
-
-Entre sus operaciones se encuentran:
-
-```text
-Iniciar sesión
-Abrir sesión de caja
-Registrar ventas
-Buscar productos
-Utilizar código de barras
-Registrar pagos
-Registrar pagos QR
-Registrar pagos mixtos
-Cerrar sesión de caja
-Realizar arqueo
-```
-
----
-
-# 7. Modelo Entidad-Relación
-
-Después del análisis de los requerimientos se construyó el Modelo Entidad-Relación.
-
-El modelo representa las entidades principales del negocio y las relaciones existentes entre ellas.
-
-Posteriormente fue utilizado como base para generar el Modelo Relacional.
-
-El diagrama fue desarrollado y conservado dentro de:
-
-```text
-03_Modelo_ER/
-```
-
----
-
-# 8. Modelo Relacional
-
-La transformación del Modelo Entidad-Relación produjo una estructura formada por 21 tablas.
-
-Las tablas finales son:
-
-```text
-1. ROL
-2. USUARIO
-3. CATEGORIA
-4. UNIDAD_MEDIDA
-5. PRODUCTO
-6. PRESENTACION_PRODUCTO
-7. PROVEEDOR
-8. COMPRA
-9. DETALLE_COMPRA
-10. LOTE_PRODUCTO
-11. UBICACION
-12. LOTE_UBICACION
-13. AJUSTE_INVENTARIO
-14. SESION_CAJA
-15. VENTA
-16. DETALLE_VENTA
-17. DETALLE_VENTA_LOTE
-18. PAGO
-19. DENOMINACION
-20. ARQUEO_CAJA
-21. DETALLE_ARQUEO
-```
-
----
-
-# 9. Normalización
-
-El modelo fue revisado aplicando:
-
-```text
-Primera Forma Normal  (1FN)
-Segunda Forma Normal  (2FN)
-Tercera Forma Normal  (3FN)
-```
-
-## Primera Forma Normal
-
-Los campos contienen valores atómicos y no existen grupos repetitivos dentro de una misma tabla.
-
-## Segunda Forma Normal
-
-Los atributos dependen completamente de sus respectivas claves.
-
-Las relaciones de muchos a muchos fueron resueltas mediante tablas intermedias o tablas de detalle.
-
-## Tercera Forma Normal
-
-Se evitaron dependencias transitivas separando información que corresponde a entidades distintas.
-
-Ejemplos:
-
-```text
-PRODUCTO → CATEGORIA
-PRODUCTO → UNIDAD_MEDIDA
-PRODUCTO → PRESENTACION_PRODUCTO
-
-COMPRA → DETALLE_COMPRA
-
-VENTA → DETALLE_VENTA
-
-ARQUEO_CAJA → DETALLE_ARQUEO
-```
-
-El resultado es una estructura que reduce redundancias y disminuye las posibilidades de anomalías de inserción, modificación y eliminación.
-
----
-
-# 10. Productos y presentaciones
-
-La tabla `PRODUCTO` almacena la información general del artículo.
-
-La tabla `PRESENTACION_PRODUCTO` permite representar diferentes formas de comercialización.
-
-Por ejemplo, un mismo producto podría comercializarse como:
-
-```text
-Unidad
-Pack
-Caja
-Fardo
-```
-
-La conversión hacia la unidad base se controla mediante:
-
-```text
-factor_conversion
-```
-
-También se registra un código de barras cuando el producto o presentación dispone de uno.
-
----
-
-# 11. Control de precios
-
-El precio de venta actual se almacena en:
-
-```text
-PRESENTACION_PRODUCTO.precio_venta
-```
-
-Sin embargo, cada detalle de venta conserva:
-
-```text
-DETALLE_VENTA.precio_unitario
-```
-
-De esta manera, si posteriormente cambia el precio actual de un producto, las ventas históricas continúan conservando el precio utilizado en el momento en que fueron realizadas.
-
----
-
-# 12. Compras y proveedores
-
-Las compras están representadas mediante:
-
-```text
-PROVEEDOR
-    ↓
-COMPRA
-    ↓
-DETALLE_COMPRA
-```
-
-Cada compra identifica:
-
-```text
-Proveedor
-Usuario responsable
-Fecha y hora
-Productos adquiridos
-Cantidad
-Costo unitario
-```
-
-Los totales pueden calcularse mediante los datos almacenados en los detalles.
-
----
-
-# 13. Control de lotes
-
-Cada ingreso de mercadería puede originar uno o varios registros de lote.
-
-La tabla:
-
-```text
-LOTE_PRODUCTO
-```
-
-permite registrar:
-
-```text
-Código de lote
-Fecha de vencimiento
-Cantidad inicial
-Compra de origen
-```
-
-Esto proporciona trazabilidad sobre el origen de las existencias.
-
----
-
-# 14. Ubicaciones
-
-La mercadería puede encontrarse en diferentes lugares físicos.
-
-Se definieron ubicaciones iniciales como:
-
-```text
-Almacén
-Estante
-Refrigerador
-Vitrina
-```
-
-La relación:
-
-```text
-LOTE_UBICACION
-```
-
-permite saber qué cantidad de un lote se encuentra en una determinada ubicación.
-
----
-
-# 15. Control de stock
-
-El stock actual no se almacena directamente en la tabla `PRODUCTO`.
-
-Se obtiene utilizando:
-
-```text
-SUM(LOTE_UBICACION.cantidad_actual)
-```
-
-Esta decisión evita mantener dos fuentes distintas para la misma existencia.
-
-Además se registra:
-
-```text
-PRODUCTO.stock_minimo
-```
-
-para identificar productos que requieren reposición.
-
-Los posibles estados utilizados en las consultas son:
-
-```text
-DISPONIBLE
-STOCK BAJO
-AGOTADO
-```
-
----
-
-# 16. Ajustes de inventario
-
-Las pérdidas de mercadería que no corresponden a ventas se registran mediante:
-
-```text
-AJUSTE_INVENTARIO
-```
-
-Los tipos considerados son:
-
-```text
-DAÑADO
-PERDIDO
-VENCIDO
-OTRO
-```
-
-Cada ajuste mantiene información del usuario responsable, fecha, cantidad y observación.
-
----
-
-# 17. Ventas
-
-Una venta pertenece a una sesión de caja.
-
-La estructura utilizada es:
-
-```text
-SESION_CAJA
-      ↓
-    VENTA
-      ↓
-DETALLE_VENTA
-```
-
-Cada detalle almacena:
-
-```text
-Presentación
-Cantidad
-Precio unitario histórico
-```
-
-El total de una venta se calcula sumando:
-
-```text
-cantidad × precio_unitario
-```
-
-de todos sus detalles.
-
----
-
-# 18. Anulación de ventas
-
-Las ventas no se eliminan físicamente.
-
-Se utiliza el campo:
-
-```text
-estado
-```
-
-con valores:
-
-```text
-VIGENTE
-ANULADA
-```
-
-Cuando corresponde una anulación también se conserva:
-
-```text
-motivo_anulacion
-```
-
-Esto permite mantener la trazabilidad histórica de las operaciones.
-
----
-
-# 19. FIFO
-
-El criterio establecido para la salida de mercadería es FIFO.
-
-FIFO significa:
-
-```text
-First In, First Out
-Primero en entrar, primero en salir
-```
-
-La tabla:
-
-```text
-DETALLE_VENTA_LOTE
-```
-
-registra exactamente de qué lote y ubicación salió cada cantidad vendida.
-
-La trazabilidad utilizada es:
-
-```text
-DETALLE_VENTA
-        ↓
-DETALLE_VENTA_LOTE
-        ↓
-LOTE_UBICACION
-        ↓
-LOTE_PRODUCTO
-```
-
----
-
-# 20. Prueba FIFO realizada
-
-Durante la validación se ingresaron dos lotes:
-
-```text
-LOTE-ANTIGUO-001 = 10 unidades
-LOTE-NUEVO-002   = 10 unidades
-```
-
-Posteriormente se realizó una venta de:
-
-```text
-12 unidades
-```
-
-El resultado registrado fue:
-
-```text
-LOTE-ANTIGUO-001 → 10 unidades
-LOTE-NUEVO-002   → 2 unidades
-```
-
-Esto demostró la trazabilidad del criterio FIFO dentro del modelo.
-
----
-
-# 21. Formas de pago
-
-La tabla:
-
-```text
-PAGO
-```
-
-se encuentra separada de `VENTA`.
-
-Esto permite registrar varios pagos para una misma operación.
-
-Los métodos actualmente considerados son:
-
-```text
-EFECTIVO
-QR
-```
-
-Gracias a esta estructura también se pueden registrar pagos mixtos.
-
----
-
-# 22. Prueba de pago mixto
-
-Durante las pruebas se realizó una venta de:
-
-```text
-144 Bs
-```
-
-La operación se pagó de la siguiente manera:
-
-```text
-EFECTIVO = 100 Bs
-QR       = 44 Bs
-```
-
-La suma fue:
-
-```text
-144 Bs
-```
-
-La validación automática obtuvo:
-
-```text
-diferencia = 0
-resultado = OK
-```
-
----
-
-# 23. Sesiones de caja
-
-Cada encargado trabaja asociado a una:
-
-```text
-SESION_CAJA
-```
-
-La sesión almacena:
-
-```text
-Usuario
-Fecha y hora de apertura
-Monto inicial
-Fecha y hora de cierre
-Estado
-Observaciones
-```
-
-Los estados considerados son:
-
-```text
-ABIERTA
-CERRADA
-```
-
----
-
-# 24. Arqueo de caja
-
-El arqueo se representa mediante:
-
-```text
-ARQUEO_CAJA
-        ↓
+ROL                       USUARIO
+CATEGORIA                 UNIDAD_MEDIDA
+PRODUCTO                  PRESENTACION_PRODUCTO
+PROVEEDOR                 COMPRA
+DETALLE_COMPRA            LOTE_PRODUCTO
+UBICACION                 LOTE_UBICACION
+AJUSTE_INVENTARIO         SESION_CAJA
+VENTA                     DETALLE_VENTA
+DETALLE_VENTA_LOTE        PAGO
+DENOMINACION              ARQUEO_CAJA
 DETALLE_ARQUEO
-        ↓
-DENOMINACION
 ```
 
-Esto permite registrar cuántos billetes y monedas existen durante el cierre.
+La capa V2 incorpora 14 vistas, 5 procedimientos operativos y 21 triggers sin agregar tablas persistentes.
 
-El efectivo contado se calcula mediante:
+## 3. Unidad base y conversiones
+
+Cada producto define una unidad base mediante `PRODUCTO.id_unidad_medida`. La presentación define el multiplicador mediante `factor_conversion`.
 
 ```text
-SUM(valor × cantidad)
+Compra base = DETALLE_COMPRA.cantidad × factor_conversion
+Venta base  = DETALLE_VENTA.cantidad × factor_conversion
 ```
 
----
+Las cantidades comerciales permanecen en los detalles de compra y venta. Los lotes, ubicaciones y movimientos FIFO se expresan en unidad base con tres decimales.
 
-# 25. Prueba de caja
-
-La sesión de prueba comenzó con:
+Casos implementados:
 
 ```text
-Monto inicial = 100 Bs
+1 caja de 24 cervezas → 24 unidades
+2 kg de maní          → 2000 gramos
+1 libra de maní       → 453.592 gramos
+0.250 kg vendidos     → 250 gramos descontados
 ```
 
-Durante la venta se recibieron:
+El importe de la venta por peso se calcula con la cantidad comercial y el precio de esa presentación. Por ejemplo, `0.250 kg × 20 Bs/kg = 5 Bs`.
+
+## 4. Compra e ingreso de inventario
+
+`sp_registrar_compra` recibe uno o varios detalles JSON y ejecuta dentro de una transacción:
 
 ```text
-100 Bs en efectivo
+COMPRA
+  ↓
+DETALLE_COMPRA (presentaciones)
+  ↓  cantidad × factor_conversion
+LOTE_PRODUCTO (unidad base)
+  ↓
+LOTE_UBICACION (unidad base)
 ```
 
-Por lo tanto:
+Los triggers impiden que los lotes superen lo comprado o que las ubicaciones representen más unidades que la cantidad inicial del lote.
+
+## 5. Venta atómica
+
+`sp_registrar_venta` confirma la operación únicamente si puede completar todos los pasos:
+
+1. La sesión existe y está abierta.
+2. Producto y presentación están activos.
+3. Cantidad y factor son positivos.
+4. Existe stock vendible suficiente.
+5. Los lotes no están vencidos.
+6. Cada lote pertenece al producto vendido.
+7. La salida sigue FIFO.
+8. Las existencias se bloquean con `FOR UPDATE`.
+9. Se conserva el precio histórico.
+10. La suma de pagos coincide exactamente con el total.
+
+Ante cualquier error se ejecuta `ROLLBACK`, incluido el stock descontado por los triggers.
+
+## 6. FIFO
+
+Los lotes vendibles se ordenan mediante:
 
 ```text
-Efectivo esperado = 200 Bs
+COMPRA.fecha_hora
+LOTE_PRODUCTO.id_lote
+LOTE_UBICACION.id_lote_ubicacion
 ```
 
-Durante el arqueo se registraron:
+El escenario usa una venta de 12 unidades sobre lotes de 10 y 10. La trazabilidad esperada es:
 
 ```text
-200 Bs
+LOTE-ANTIGUO-001 → 10
+LOTE-NUEVO-002   → 2
 ```
 
-La diferencia obtenida fue:
+Cada asignación queda registrada en `DETALLE_VENTA_LOTE` y no puede modificarse o eliminarse posteriormente.
+
+## 7. Vencimientos y clases de stock
+
+La V2 distingue:
+
+- `stock_fisico`: toda mercancía presente.
+- `stock_disponible`: solo lotes no vencidos.
+- `stock_vencido`: mercancía física cuya fecha ya fue alcanzada.
+
+Un lote vencido permanece visible en inventario, queda excluido de FIFO y solo se retira físicamente mediante un ajuste `VENCIDO`.
+
+Las vistas permiten consultar totales por producto y el detalle por lote/ubicación. `vw_lotes_proximos_vencer` muestra exclusivamente los próximos 30 días.
+
+## 8. Anulación
+
+`sp_anular_venta` utiliza la trazabilidad histórica para devolver a cada `LOTE_UBICACION` la cantidad exacta consumida. Luego marca la venta como `ANULADA` y guarda el motivo.
+
+Se conservan:
+
+- `DETALLE_VENTA`.
+- `DETALLE_VENTA_LOTE`.
+- `PAGO`.
+
+Un trigger obliga a utilizar el procedimiento y la rutina impide anular dos veces.
+
+## 9. Pagos
+
+Los métodos soportados son `EFECTIVO` y `QR`, incluida su combinación en una venta. Se utiliza `DECIMAL(15,2)`.
+
+Reglas:
+
+- Monto positivo.
+- QR con comprobante no vacío.
+- Ningún pago puede superar el total.
+- La transacción final exige igualdad exacta entre pagos y venta.
+- Los pagos confirmados son históricos.
+- El efectivo de una venta anulada no se incluye en caja.
+
+## 10. Sesión y arqueo
+
+La restricción de `SESION_CAJA` hace equivalentes estado y fecha de cierre:
 
 ```text
-0 Bs
+ABIERTA  ↔ fecha_hora_cierre IS NULL
+CERRADA ↔ fecha_hora_cierre válida y posterior a apertura
 ```
 
-Resultado:
+La venta exige sesión abierta. `sp_cerrar_sesion_caja` bloquea la sesión, registra cierre, arqueo y denominaciones en una transacción. Una diferencia requiere observación.
+
+El efectivo esperado es:
 
 ```text
-CUADRA
+monto_inicial + pagos EFECTIVO de ventas VIGENTES
 ```
 
----
+## 11. Ajustes
 
-# 26. Vistas
+`sp_registrar_ajuste_inventario` mantiene `DAÑADO`, `PERDIDO`, `VENCIDO` y `OTRO`. Bloquea la existencia, comprueba disponibilidad y registra/descuenta en la misma transacción. No permite stock negativo.
 
-Se implementaron 11 vistas.
+## 12. Estados e historial
+
+Se agregaron `CHECK` para estados maestros `ACTIVO/INACTIVO`, sesiones `ABIERTA/CERRADA` y ventas `VIGENTE/ANULADA`. Las cantidades, factores y montos también tienen límites declarativos.
+
+El factor y la unidad base no pueden cambiar después de generar historia incompatible. Los movimientos FIFO, pagos y ajustes confirmados son inmutables.
+
+## 13. Códigos de barras
+
+`PRESENTACION_PRODUCTO.codigo_barras` conserva el tipo `VARCHAR(50)` y la unicidad cuando existe. Esto admite:
+
+- EAN-13.
+- EAN-8.
+- UPC con cero inicial.
+- Códigos internos alfanuméricos.
+
+No se añadió conexión a Internet ni API de productos.
+
+## 14. Pruebas
+
+`07_pruebas_finales.sql` ya no imprime un éxito incondicional. Las assertions se ejecutan dentro de un procedimiento; cualquier fallo emite `SIGNAL SQLSTATE '45000'` y evita el mensaje final.
+
+La cobertura incluye estructura, UTF-8, conversiones, peso decimal, FIFO, vencimientos, stock físico/disponible, pagos, caja, arqueo, anulación, ajustes y casos negativos con verificación de rollback.
+
+El único mensaje de éxito permitido es:
 
 ```text
-vw_stock_producto
-vw_productos_stock_bajo
-vw_stock_lote_ubicacion
-vw_lotes_proximos_vencer
-vw_compras_totales
-vw_ventas_totales
-vw_pagos_venta
-vw_productos_mas_vendidos
-vw_efectivo_esperado_sesion
-vw_efectivo_contado_arqueo
-vw_diferencias_caja
+BASE DE DATOS PARÍS LICORERÍA V2 VALIDADA
 ```
 
-Las vistas permiten consultar información derivada sin almacenar valores redundantes.
+## 15. Conclusión
 
----
-
-# 27. Implementación física
-
-La base fue implementada utilizando MySQL.
-
-Se utilizaron:
-
-```text
-PRIMARY KEY
-FOREIGN KEY
-UNIQUE
-CHECK
-AUTO_INCREMENT
-DATETIME
-DATE
-DECIMAL
-VARCHAR
-```
-
-Las relaciones utilizan claves foráneas para reforzar la integridad referencial.
-
-También se utilizaron restricciones `CHECK` para impedir determinados valores inválidos.
-
----
-
-# 28. Codificación
-
-La base utiliza:
-
-```text
-utf8mb4
-```
-
-Durante las pruebas se verificó correctamente el almacenamiento de caracteres especiales en textos como:
-
-```text
-Bebidas alcohólicas
-Almacén
-```
-
----
-
-# 29. Prueba integral
-
-La prueba final comprobó:
-
-```text
-21 tablas                       OK
-11 vistas                       OK
-Codificación UTF-8              OK
-Compras                         OK
-Inventario                      OK
-Stock mínimo                    OK
-FIFO                            OK
-Venta                           OK
-Pago mixto                      OK
-Ajuste de inventario            OK
-Sesión de caja                  OK
-Arqueo                          OK
-Existencias negativas           0
-Diferencia de pagos             0
-Diferencia de caja              0
-```
-
-La prueba terminó mostrando:
-
-```text
-BASE DE DATOS PARÍS LICORERÍA VALIDADA
-```
-
----
-
-# 30. Tecnologías utilizadas
-
-Durante el desarrollo se utilizaron:
-
-```text
-MySQL Server 8.0
-SQL
-MySQL CLI
-Visual Studio Code
-Mermaid
-Draw.io
-Markdown
-Git
-GitHub
-PowerShell
-```
-
----
-
-# 31. Organización del proyecto
-
-El repositorio se encuentra organizado de la siguiente manera:
-
-```text
-BD1-Paris-Licoreria/
-│
-├── 01_Entrevista/
-├── 02_Requerimientos/
-├── 03_Modelo_ER/
-├── 04_Modelo_Relacional/
-├── 05_SQL/
-├── 06_Documentacion/
-└── README.md
-```
-
-Esta estructura permite identificar fácilmente cada etapa del trabajo realizado.
-
----
-
-# 32. Scripts SQL
-
-La implementación SQL contiene:
-
-```text
-00_ejecutar_todo.sql
-01_creacion_bd.sql
-02_creacion_tablas.sql
-03_datos_iniciales.sql
-04_vistas.sql
-05_consultas_prueba.sql
-06_datos_prueba.sql
-07_pruebas_finales.sql
-```
-
-El archivo:
-
-```text
-00_ejecutar_todo.sql
-```
-
-permite ejecutar el escenario completo de validación.
-
----
-
-# 33. Resultados obtenidos
-
-Las pruebas realizadas comprobaron que la estructura puede registrar correctamente las principales operaciones planteadas para París Licorería.
-
-El escenario integral produjo:
-
-```text
-Stock inicial          = 20 unidades
-Venta                  = 12 unidades
-Producto dañado        = 1 unidad
-Stock final            = 7 unidades
-Stock mínimo           = 10 unidades
-Estado                 = STOCK BAJO
-
-Total venta            = 144 Bs
-Pago efectivo          = 100 Bs
-Pago QR                = 44 Bs
-Total pagado           = 144 Bs
-
-Efectivo esperado      = 200 Bs
-Efectivo contado       = 200 Bs
-Diferencia caja        = 0 Bs
-Resultado              = CUADRA
-```
-
----
-
-# 34. Conclusiones
-
-El proyecto permitió desarrollar una base de datos relacional basada en las necesidades identificadas en París Licorería.
-
-El modelo diseñado permite organizar la información correspondiente a usuarios, productos, categorías, presentaciones, proveedores, compras, lotes, ubicaciones, inventario, ventas, pagos y caja.
-
-La normalización hasta Tercera Forma Normal reduce redundancias y ayuda a mantener consistencia en la información.
-
-La utilización de claves primarias, claves foráneas, restricciones `UNIQUE` y restricciones `CHECK` fortalece la integridad del modelo físico.
-
-El diseño de lotes y ubicaciones permite mantener una única fuente operativa para las existencias y conservar trazabilidad sobre las salidas de inventario.
-
-La relación entre detalle de venta y lotes permite representar el criterio FIFO.
-
-La separación de los pagos permite registrar operaciones en efectivo, QR y pagos mixtos.
-
-Las sesiones y arqueos proporcionan una estructura para controlar aperturas, cierres y diferencias de caja.
-
-Finalmente, la implementación fue probada en MySQL mediante un escenario integral y las validaciones realizadas confirmaron el correcto funcionamiento de los componentes principales de la base de datos.
-
-La solución desarrollada constituye una base sólida para la futura implementación de un sistema de gestión para París Licorería.
+La V2 conserva la normalización y las 21 tablas del trabajo académico, pero traslada las reglas multirow críticas a operaciones atómicas. La combinación de `CHECK`, FK, triggers, procedimientos, bloqueos y pruebas convierte el esquema en una base mucho más segura para el desarrollo futuro de la aplicación de licorería.
