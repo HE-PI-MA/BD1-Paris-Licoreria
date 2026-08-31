@@ -1,590 +1,335 @@
-# Modelo Relacional - París Licorería
+# Modelo Relacional V2 — París Licorería
 
-## 1. Introducción
+## 1. Alcance
 
-El presente modelo relacional se obtiene a partir del Modelo Entidad-Relación de París Licorería.
+La V2 conserva las 21 relaciones del modelo académico y fortalece su comportamiento mediante claves foráneas, restricciones `UNIQUE` y `CHECK`, triggers y procedimientos almacenados transaccionales compatibles con MySQL 8.0.44.
 
-En esta etapa se transforman las entidades identificadas en relaciones o tablas, definiendo:
+No se agregaron tablas: las operaciones temporales recibidas como JSON se procesan en tablas temporales de sesión y no forman parte del modelo persistente.
 
-- Claves primarias.
-- Claves foráneas.
-- Tipos de datos.
-- Campos obligatorios.
-- Campos opcionales.
-- Restricciones de unicidad.
-- Relaciones entre tablas.
+## 2. Regla de unidad base
 
-El modelo está compuesto por 21 tablas.
+`PRODUCTO.id_unidad_medida` identifica la unidad base del inventario. Todas las existencias físicas se expresan en esa unidad.
 
----
-
-# 2. ROL
-
-| Campo | Tipo | Restricciones |
-|---|---|---|
-| id_rol | INT | PK, AUTO_INCREMENT |
-| nombre | VARCHAR(50) | NOT NULL, UNIQUE |
-| descripcion | VARCHAR(150) | NULL |
-
-**Clave primaria:** `id_rol`
-
-**Relación:**
-
-`ROL 1 : N USUARIO`
-
----
-
-# 3. USUARIO
-
-| Campo | Tipo | Restricciones |
-|---|---|---|
-| id_usuario | INT | PK, AUTO_INCREMENT |
-| id_rol | INT | FK, NOT NULL |
-| nombre | VARCHAR(80) | NOT NULL |
-| apellido | VARCHAR(80) | NOT NULL |
-| nombre_usuario | VARCHAR(50) | NOT NULL, UNIQUE |
-| contrasena | VARCHAR(255) | NOT NULL |
-| estado | VARCHAR(20) | NOT NULL |
-
-**Clave primaria:** `id_usuario`
-
-**Clave foránea:**
-
-`id_rol → ROL(id_rol)`
-
-La contraseña deberá almacenarse posteriormente mediante un hash seguro y no como texto plano.
-
----
-
-# 4. CATEGORIA
-
-| Campo | Tipo | Restricciones |
-|---|---|---|
-| id_categoria | INT | PK, AUTO_INCREMENT |
-| nombre | VARCHAR(80) | NOT NULL, UNIQUE |
-| descripcion | VARCHAR(150) | NULL |
-| estado | VARCHAR(20) | NOT NULL |
-
-**Clave primaria:** `id_categoria`
-
----
-
-# 5. UNIDAD_MEDIDA
-
-| Campo | Tipo | Restricciones |
-|---|---|---|
-| id_unidad_medida | INT | PK, AUTO_INCREMENT |
-| nombre | VARCHAR(50) | NOT NULL, UNIQUE |
-| abreviatura | VARCHAR(10) | NOT NULL |
-
-**Clave primaria:** `id_unidad_medida`
-
-Ejemplos:
-
-- Unidad.
-- Kilogramo.
-- Gramo.
-
-Las presentaciones comerciales como caja, paquete o fardo se manejarán mediante `PRESENTACION_PRODUCTO`.
-
----
-
-# 6. PRODUCTO
-
-| Campo | Tipo | Restricciones |
-|---|---|---|
-| id_producto | INT | PK, AUTO_INCREMENT |
-| id_categoria | INT | FK, NOT NULL |
-| id_unidad_medida | INT | FK, NOT NULL |
-| nombre | VARCHAR(120) | NOT NULL |
-| descripcion | VARCHAR(255) | NULL |
-| stock_minimo | DECIMAL(12,3) | NOT NULL, DEFAULT 0 |
-| estado | VARCHAR(20) | NOT NULL |
-
-**Clave primaria:** `id_producto`
-
-**Claves foráneas:**
-
-`id_categoria → CATEGORIA(id_categoria)`
-
-`id_unidad_medida → UNIDAD_MEDIDA(id_unidad_medida)`
-
-## Stock actual
-
-No se almacenará un campo `stock_actual` en PRODUCTO.
-
-El stock disponible se obtendrá mediante la suma de:
-
-`LOTE_UBICACION.cantidad_actual`
-
-correspondiente a los lotes del producto.
-
----
-
-# 7. PRESENTACION_PRODUCTO
-
-| Campo | Tipo | Restricciones |
-|---|---|---|
-| id_presentacion | INT | PK, AUTO_INCREMENT |
-| id_producto | INT | FK, NOT NULL |
-| nombre_presentacion | VARCHAR(80) | NOT NULL |
-| factor_conversion | DECIMAL(12,3) | NOT NULL |
-| codigo_barras | VARCHAR(50) | NULL, UNIQUE |
-| precio_venta | DECIMAL(12,2) | NOT NULL |
-| estado | VARCHAR(20) | NOT NULL |
-
-**Clave primaria:** `id_presentacion`
-
-**Clave foránea:**
-
-`id_producto → PRODUCTO(id_producto)`
-
-## Factor de conversión
-
-Permite convertir una presentación a la unidad base del producto.
-
-Ejemplo:
+`PRESENTACION_PRODUCTO.factor_conversion` indica la cantidad de unidades base contenida en una presentación:
 
 ```text
+Producto base UNIDAD
 Unidad       = 1
 Pack de 6    = 6
 Caja de 24   = 24
-Para productos por peso también podrán utilizarse valores decimales.
 
----
-
-# 8. PROVEEDOR
-
-| Campo | Tipo | Restricciones |
-|---|---|---|
-| id_proveedor | INT | PK, AUTO_INCREMENT |
-| nombre | VARCHAR(120) | NOT NULL |
-| contacto | VARCHAR(100) | NULL |
-| telefono | VARCHAR(30) | NULL |
-| direccion | VARCHAR(200) | NULL |
-| estado | VARCHAR(20) | NOT NULL |
-
-**Clave primaria:** `id_proveedor`
-
----
-
-# 9. COMPRA
-
-| Campo | Tipo | Restricciones |
-|---|---|---|
-| id_compra | INT | PK, AUTO_INCREMENT |
-| id_proveedor | INT | FK, NOT NULL |
-| id_usuario | INT | FK, NOT NULL |
-| fecha_hora | DATETIME | NOT NULL |
-| observacion | VARCHAR(250) | NULL |
-
-**Clave primaria:** `id_compra`
-
-**Claves foráneas:**
-
-`id_proveedor → PROVEEDOR(id_proveedor)`
-
-`id_usuario → USUARIO(id_usuario)`
-
-## Total
-
-El total de la compra podrá calcularse mediante:
-
-`SUM(cantidad × costo_unitario)`
-
-de sus registros en `DETALLE_COMPRA`.
-
----
-
-# 10. DETALLE_COMPRA
-
-| Campo | Tipo | Restricciones |
-|---|---|---|
-| id_detalle_compra | INT | PK, AUTO_INCREMENT |
-| id_compra | INT | FK, NOT NULL |
-| id_presentacion | INT | FK, NOT NULL |
-| cantidad | DECIMAL(12,3) | NOT NULL |
-| costo_unitario | DECIMAL(12,2) | NOT NULL |
-
-**Clave primaria:** `id_detalle_compra`
-
-**Claves foráneas:**
-
-`id_compra → COMPRA(id_compra)`
-
-`id_presentacion → PRESENTACION_PRODUCTO(id_presentacion)`
-
-El subtotal puede calcularse mediante:
-
-`cantidad × costo_unitario`
-
----
-
-# 11. LOTE_PRODUCTO
-
-| Campo | Tipo | Restricciones |
-|---|---|---|
-| id_lote | INT | PK, AUTO_INCREMENT |
-| id_detalle_compra | INT | FK, NOT NULL |
-| codigo_lote | VARCHAR(80) | NULL |
-| fecha_vencimiento | DATE | NULL |
-| cantidad_inicial | DECIMAL(12,3) | NOT NULL |
-
-**Clave primaria:** `id_lote`
-
-**Clave foránea:**
-
-`id_detalle_compra → DETALLE_COMPRA(id_detalle_compra)`
-
-`fecha_vencimiento` podrá ser NULL cuando el producto no tenga vencimiento.
-
-La cantidad inicial deberá expresarse en la unidad base del producto.
-
----
-
-# 12. UBICACION
-
-| Campo | Tipo | Restricciones |
-|---|---|---|
-| id_ubicacion | INT | PK, AUTO_INCREMENT |
-| nombre | VARCHAR(80) | NOT NULL, UNIQUE |
-| descripcion | VARCHAR(150) | NULL |
-| estado | VARCHAR(20) | NOT NULL |
-
-**Clave primaria:** `id_ubicacion`
-
-Ejemplos:
-
-- Refrigerador.
-- Estante.
-- Vitrina.
-- Almacén.
-
----
-
-# 13. LOTE_UBICACION
-
-| Campo | Tipo | Restricciones |
-|---|---|---|
-| id_lote_ubicacion | INT | PK, AUTO_INCREMENT |
-| id_lote | INT | FK, NOT NULL |
-| id_ubicacion | INT | FK, NOT NULL |
-| cantidad_actual | DECIMAL(12,3) | NOT NULL |
-
-**Clave primaria:** `id_lote_ubicacion`
-
-**Claves foráneas:**
-
-`id_lote → LOTE_PRODUCTO(id_lote)`
-
-`id_ubicacion → UBICACION(id_ubicacion)`
-
-**Restricción UNIQUE:**
-
-`(id_lote, id_ubicacion)`
-
-Esta tabla será la fuente principal para determinar el stock disponible.
-
----
-
-# 14. AJUSTE_INVENTARIO
-
-| Campo | Tipo | Restricciones |
-|---|---|---|
-| id_ajuste | INT | PK, AUTO_INCREMENT |
-| id_lote_ubicacion | INT | FK, NOT NULL |
-| id_usuario | INT | FK, NOT NULL |
-| fecha_hora | DATETIME | NOT NULL |
-| tipo_ajuste | VARCHAR(30) | NOT NULL |
-| cantidad | DECIMAL(12,3) | NOT NULL |
-| observacion | VARCHAR(250) | NULL |
-
-**Clave primaria:** `id_ajuste`
-
-**Claves foráneas:**
-
-`id_lote_ubicacion → LOTE_UBICACION(id_lote_ubicacion)`
-
-`id_usuario → USUARIO(id_usuario)`
-
-Ejemplos de tipo:
-
-- DAÑADO.
-- PERDIDO.
-- VENCIDO.
-- OTRO.
-
----
-
-# 15. SESION_CAJA
-
-| Campo | Tipo | Restricciones |
-|---|---|---|
-| id_sesion_caja | INT | PK, AUTO_INCREMENT |
-| id_usuario | INT | FK, NOT NULL |
-| fecha_hora_apertura | DATETIME | NOT NULL |
-| monto_inicial | DECIMAL(12,2) | NOT NULL |
-| fecha_hora_cierre | DATETIME | NULL |
-| estado | VARCHAR(20) | NOT NULL |
-| observacion | VARCHAR(250) | NULL |
-
-**Clave primaria:** `id_sesion_caja`
-
-**Clave foránea:**
-
-`id_usuario → USUARIO(id_usuario)`
-
----
-
-# 16. VENTA
-
-| Campo | Tipo | Restricciones |
-|---|---|---|
-| id_venta | INT | PK, AUTO_INCREMENT |
-| id_sesion_caja | INT | FK, NOT NULL |
-| fecha_hora | DATETIME | NOT NULL |
-| estado | VARCHAR(20) | NOT NULL |
-| motivo_anulacion | VARCHAR(250) | NULL |
-
-**Clave primaria:** `id_venta`
-
-**Clave foránea:**
-
-`id_sesion_caja → SESION_CAJA(id_sesion_caja)`
-
----
-
-# 17. DETALLE_VENTA
-
-| Campo | Tipo | Restricciones |
-|---|---|---|
-| id_detalle_venta | INT | PK, AUTO_INCREMENT |
-| id_venta | INT | FK, NOT NULL |
-| id_presentacion | INT | FK, NOT NULL |
-| cantidad | DECIMAL(12,3) | NOT NULL |
-| precio_unitario | DECIMAL(12,2) | NOT NULL |
-
-**Clave primaria:** `id_detalle_venta`
-
-**Claves foráneas:**
-
-`id_venta → VENTA(id_venta)`
-
-`id_presentacion → PRESENTACION_PRODUCTO(id_presentacion)`
-
----
-
-# 18. DETALLE_VENTA_LOTE
-
-| Campo | Tipo | Restricciones |
-|---|---|---|
-| id_detalle_venta_lote | INT | PK, AUTO_INCREMENT |
-| id_detalle_venta | INT | FK, NOT NULL |
-| id_lote_ubicacion | INT | FK, NOT NULL |
-| cantidad_base | DECIMAL(12,3) | NOT NULL |
-
-**Clave primaria:** `id_detalle_venta_lote`
-
-**Claves foráneas:**
-
-`id_detalle_venta → DETALLE_VENTA(id_detalle_venta)`
-
-`id_lote_ubicacion → LOTE_UBICACION(id_lote_ubicacion)`
-
-**Restricción UNIQUE recomendada:**
-
-`(id_detalle_venta, id_lote_ubicacion)`
-
----
-
-# 19. PAGO
-
-| Campo | Tipo | Restricciones |
-|---|---|---|
-| id_pago | INT | PK, AUTO_INCREMENT |
-| id_venta | INT | FK, NOT NULL |
-| metodo_pago | VARCHAR(20) | NOT NULL |
-| monto | DECIMAL(12,2) | NOT NULL |
-| comprobante_qr | VARCHAR(255) | NULL |
-
-**Clave primaria:** `id_pago`
-
-**Clave foránea:**
-
-`id_venta → VENTA(id_venta)`
-
-Métodos iniciales:
-
-- EFECTIVO.
-- QR.
-
----
-
-# 20. DENOMINACION
-
-| Campo | Tipo | Restricciones |
-|---|---|---|
-| id_denominacion | INT | PK, AUTO_INCREMENT |
-| valor | DECIMAL(12,2) | NOT NULL, UNIQUE |
-| tipo | VARCHAR(20) | NOT NULL |
-| estado | VARCHAR(20) | NOT NULL |
-
-**Clave primaria:** `id_denominacion`
-
----
-
-# 21. ARQUEO_CAJA
-
-| Campo | Tipo | Restricciones |
-|---|---|---|
-| id_arqueo | INT | PK, AUTO_INCREMENT |
-| id_sesion_caja | INT | FK, NOT NULL, UNIQUE |
-| fecha_hora | DATETIME | NOT NULL |
-| observacion | VARCHAR(250) | NULL |
-
-**Clave primaria:** `id_arqueo`
-
-**Clave foránea:**
-
-`id_sesion_caja → SESION_CAJA(id_sesion_caja)`
-
----
-
-# 22. DETALLE_ARQUEO
-
-| Campo | Tipo | Restricciones |
-|---|---|---|
-| id_detalle_arqueo | INT | PK, AUTO_INCREMENT |
-| id_arqueo | INT | FK, NOT NULL |
-| id_denominacion | INT | FK, NOT NULL |
-| cantidad | INT | NOT NULL |
-
-**Clave primaria:** `id_detalle_arqueo`
-
-**Claves foráneas:**
-
-`id_arqueo → ARQUEO_CAJA(id_arqueo)`
-
-`id_denominacion → DENOMINACION(id_denominacion)`
-
-**Restricción UNIQUE:**
-
-`(id_arqueo, id_denominacion)`
-
----
-
-# 23. Resumen de claves foráneas
-
-| Tabla | FK | Referencia |
-|---|---|---|
-| USUARIO | id_rol | ROL |
-| PRODUCTO | id_categoria | CATEGORIA |
-| PRODUCTO | id_unidad_medida | UNIDAD_MEDIDA |
-| PRESENTACION_PRODUCTO | id_producto | PRODUCTO |
-| COMPRA | id_proveedor | PROVEEDOR |
-| COMPRA | id_usuario | USUARIO |
-| DETALLE_COMPRA | id_compra | COMPRA |
-| DETALLE_COMPRA | id_presentacion | PRESENTACION_PRODUCTO |
-| LOTE_PRODUCTO | id_detalle_compra | DETALLE_COMPRA |
-| LOTE_UBICACION | id_lote | LOTE_PRODUCTO |
-| LOTE_UBICACION | id_ubicacion | UBICACION |
-| AJUSTE_INVENTARIO | id_lote_ubicacion | LOTE_UBICACION |
-| AJUSTE_INVENTARIO | id_usuario | USUARIO |
-| SESION_CAJA | id_usuario | USUARIO |
-| VENTA | id_sesion_caja | SESION_CAJA |
-| DETALLE_VENTA | id_venta | VENTA |
-| DETALLE_VENTA | id_presentacion | PRESENTACION_PRODUCTO |
-| DETALLE_VENTA_LOTE | id_detalle_venta | DETALLE_VENTA |
-| DETALLE_VENTA_LOTE | id_lote_ubicacion | LOTE_UBICACION |
-| PAGO | id_venta | VENTA |
-| ARQUEO_CAJA | id_sesion_caja | SESION_CAJA |
-| DETALLE_ARQUEO | id_arqueo | ARQUEO_CAJA |
-| DETALLE_ARQUEO | id_denominacion | DENOMINACION |
-
----
-
-# 24. Restricciones de unicidad importantes
-
-- `ROL.nombre` → UNIQUE
-- `USUARIO.nombre_usuario` → UNIQUE
-- `CATEGORIA.nombre` → UNIQUE
-- `UNIDAD_MEDIDA.nombre` → UNIQUE
-- `PRESENTACION_PRODUCTO.codigo_barras` → UNIQUE cuando exista
-- `UBICACION.nombre` → UNIQUE
-- `(id_lote, id_ubicacion)` → UNIQUE
-- `(id_detalle_venta, id_lote_ubicacion)` → UNIQUE
-- `DENOMINACION.valor` → UNIQUE
-- `ARQUEO_CAJA.id_sesion_caja` → UNIQUE
-- `(id_arqueo, id_denominacion)` → UNIQUE
-
----
-
-# 25. Valores calculados
-
-## Stock actual de producto
-
-`SUM(LOTE_UBICACION.cantidad_actual)`
-
-## Subtotal de compra
-
-`cantidad × costo_unitario`
-
-## Total de compra
-
-`SUM(subtotales de DETALLE_COMPRA)`
-
-## Subtotal de venta
-
-`cantidad × precio_unitario`
-
-## Total de venta
-
-`SUM(subtotales de DETALLE_VENTA)`
-
-## Subtotal del arqueo
-
-`DENOMINACION.valor × DETALLE_ARQUEO.cantidad`
-
-## Efectivo contado
-
-`SUM(subtotales de DETALLE_ARQUEO)`
-
-## Diferencia de caja
-
-`efectivo_contado - efectivo_esperado`
-
----
-
-# 26. Tablas del modelo
-
-1. ROL
-2. USUARIO
-3. CATEGORIA
-4. UNIDAD_MEDIDA
-5. PRODUCTO
-6. PRESENTACION_PRODUCTO
-7. PROVEEDOR
-8. COMPRA
-9. DETALLE_COMPRA
-10. LOTE_PRODUCTO
-11. UBICACION
-12. LOTE_UBICACION
-13. AJUSTE_INVENTARIO
-14. SESION_CAJA
-15. VENTA
-16. DETALLE_VENTA
-17. DETALLE_VENTA_LOTE
-18. PAGO
-19. DENOMINACION
-20. ARQUEO_CAJA
-21. DETALLE_ARQUEO
-
----
-
-# 27. Conclusión
-
-El modelo relacional transforma las entidades identificadas durante el análisis en 21 relaciones estructuradas mediante claves primarias y claves foráneas.
-
-La separación entre productos, presentaciones, compras, lotes, ubicaciones, ventas, pagos y caja permite reducir redundancias y mantener la trazabilidad de las principales operaciones de París Licorería.
-
-La siguiente etapa será verificar formalmente el cumplimiento de Primera, Segunda y Tercera Forma Normal antes de generar los scripts SQL.
+Producto base GRAMO
+Gramo        = 1
+Kilogramo    = 1000
+Libra        = 453.592
+```
+
+El bloque Markdown anterior cierra correctamente la sección que estaba incompleta en la versión inicial.
+
+## 3. Relaciones
+
+### ROL
+
+```text
+ROL(
+  id_rol PK,
+  nombre UQ,
+  descripcion
+)
+```
+
+### USUARIO
+
+```text
+USUARIO(
+  id_usuario PK,
+  id_rol FK → ROL,
+  nombre,
+  apellido,
+  nombre_usuario UQ,
+  contrasena,
+  estado CHECK(ACTIVO, INACTIVO)
+)
+```
+
+`contrasena` almacena un hash producido por la aplicación, nunca una contraseña en texto plano.
+
+### CATEGORIA
+
+```text
+CATEGORIA(
+  id_categoria PK,
+  nombre UQ,
+  descripcion,
+  estado CHECK(ACTIVO, INACTIVO)
+)
+```
+
+### UNIDAD_MEDIDA
+
+```text
+UNIDAD_MEDIDA(
+  id_unidad_medida PK,
+  nombre UQ,
+  abreviatura UQ
+)
+```
+
+### PRODUCTO
+
+```text
+PRODUCTO(
+  id_producto PK,
+  id_categoria FK → CATEGORIA,
+  id_unidad_medida FK → UNIDAD_MEDIDA,
+  nombre,
+  descripcion,
+  stock_minimo DECIMAL(15,3) CHECK >= 0,
+  estado CHECK(ACTIVO, INACTIVO)
+)
+```
+
+No contiene `stock_actual`; el inventario se obtiene desde `LOTE_UBICACION`.
+
+### PRESENTACION_PRODUCTO
+
+```text
+PRESENTACION_PRODUCTO(
+  id_presentacion PK,
+  id_producto FK → PRODUCTO,
+  nombre_presentacion,
+  factor_conversion DECIMAL(15,3) CHECK > 0,
+  codigo_barras VARCHAR(50) NULL UQ,
+  precio_venta DECIMAL(15,2) CHECK >= 0,
+  estado CHECK(ACTIVO, INACTIVO),
+  UQ(id_producto, nombre_presentacion)
+)
+```
+
+El código permanece como texto para conservar ceros iniciales y admitir EAN-13, EAN-8, UPC y códigos internos.
+
+### PROVEEDOR
+
+```text
+PROVEEDOR(
+  id_proveedor PK,
+  nombre,
+  contacto,
+  telefono,
+  direccion,
+  estado CHECK(ACTIVO, INACTIVO)
+)
+```
+
+### COMPRA y DETALLE_COMPRA
+
+```text
+COMPRA(
+  id_compra PK,
+  id_proveedor FK → PROVEEDOR,
+  id_usuario FK → USUARIO,
+  fecha_hora,
+  observacion
+)
+
+DETALLE_COMPRA(
+  id_detalle_compra PK,
+  id_compra FK → COMPRA,
+  id_presentacion FK → PRESENTACION_PRODUCTO,
+  cantidad DECIMAL(15,3) CHECK > 0,
+  costo_unitario DECIMAL(15,2) CHECK >= 0
+)
+```
+
+`DETALLE_COMPRA.cantidad` representa presentaciones compradas. El subtotal monetario es `cantidad × costo_unitario`.
+
+### LOTE_PRODUCTO y LOTE_UBICACION
+
+```text
+LOTE_PRODUCTO(
+  id_lote PK,
+  id_detalle_compra FK → DETALLE_COMPRA,
+  codigo_lote,
+  fecha_vencimiento,
+  cantidad_inicial DECIMAL(15,3) CHECK > 0
+)
+
+LOTE_UBICACION(
+  id_lote_ubicacion PK,
+  id_lote FK → LOTE_PRODUCTO,
+  id_ubicacion FK → UBICACION,
+  cantidad_actual DECIMAL(15,3) CHECK >= 0,
+  UQ(id_lote, id_ubicacion)
+)
+```
+
+`cantidad_inicial` y `cantidad_actual` se expresan en unidad base. Los triggers impiden que la suma de lotes supere `DETALLE_COMPRA.cantidad × factor_conversion` y que las ubicaciones superen la cantidad inicial del lote.
+
+### UBICACION
+
+```text
+UBICACION(
+  id_ubicacion PK,
+  nombre UQ,
+  descripcion,
+  estado CHECK(ACTIVO, INACTIVO)
+)
+```
+
+### AJUSTE_INVENTARIO
+
+```text
+AJUSTE_INVENTARIO(
+  id_ajuste PK,
+  id_lote_ubicacion FK → LOTE_UBICACION,
+  id_usuario FK → USUARIO,
+  fecha_hora,
+  tipo_ajuste CHECK(DAÑADO, PERDIDO, VENCIDO, OTRO),
+  cantidad DECIMAL(15,3) CHECK > 0,
+  observacion
+)
+```
+
+La cantidad está en unidad base. Un trigger descuenta el stock y rechaza retiros superiores a la existencia. `VENCIDO` solo acepta lotes cuya fecha ya fue alcanzada.
+
+### SESION_CAJA
+
+```text
+SESION_CAJA(
+  id_sesion_caja PK,
+  id_usuario FK → USUARIO,
+  fecha_hora_apertura,
+  monto_inicial DECIMAL(15,2) CHECK >= 0,
+  fecha_hora_cierre,
+  estado CHECK(ABIERTA, CERRADA),
+  observacion
+)
+```
+
+Regla temporal:
+
+```text
+ABIERTA  → fecha_hora_cierre IS NULL
+CERRADA → fecha_hora_cierre IS NOT NULL
+           y fecha_hora_cierre >= fecha_hora_apertura
+```
+
+### VENTA y DETALLE_VENTA
+
+```text
+VENTA(
+  id_venta PK,
+  id_sesion_caja FK → SESION_CAJA,
+  fecha_hora,
+  estado CHECK(VIGENTE, ANULADA),
+  motivo_anulacion
+)
+
+DETALLE_VENTA(
+  id_detalle_venta PK,
+  id_venta FK → VENTA,
+  id_presentacion FK → PRESENTACION_PRODUCTO,
+  cantidad DECIMAL(15,3) CHECK > 0,
+  precio_unitario DECIMAL(15,2) CHECK >= 0
+)
+```
+
+`DETALLE_VENTA.cantidad` representa presentaciones vendidas. `precio_unitario` conserva el precio histórico por presentación.
+
+### DETALLE_VENTA_LOTE
+
+```text
+DETALLE_VENTA_LOTE(
+  id_detalle_venta_lote PK,
+  id_detalle_venta FK → DETALLE_VENTA,
+  id_lote_ubicacion FK → LOTE_UBICACION,
+  cantidad_base DECIMAL(15,3) CHECK > 0,
+  UQ(id_detalle_venta, id_lote_ubicacion)
+)
+```
+
+El trigger valida que ambos caminos lleguen al mismo `PRODUCTO`, impide lotes vencidos, verifica que la suma no supere `cantidad × factor_conversion` y descuenta inventario. Los registros son históricos e inmutables.
+
+### PAGO
+
+```text
+PAGO(
+  id_pago PK,
+  id_venta FK → VENTA,
+  metodo_pago CHECK(EFECTIVO, QR),
+  monto DECIMAL(15,2) CHECK > 0,
+  comprobante_qr
+)
+```
+
+QR requiere comprobante. `sp_registrar_venta` exige igualdad exacta entre la suma de pagos y el total de la venta. Los pagos confirmados son históricos e inmutables.
+
+### DENOMINACION, ARQUEO_CAJA y DETALLE_ARQUEO
+
+```text
+DENOMINACION(
+  id_denominacion PK,
+  valor DECIMAL(15,2) UQ CHECK > 0,
+  tipo CHECK(BILLETE, MONEDA),
+  estado CHECK(ACTIVO, INACTIVO)
+)
+
+ARQUEO_CAJA(
+  id_arqueo PK,
+  id_sesion_caja FK UQ → SESION_CAJA,
+  fecha_hora,
+  observacion
+)
+
+DETALLE_ARQUEO(
+  id_detalle_arqueo PK,
+  id_arqueo FK → ARQUEO_CAJA,
+  id_denominacion FK → DENOMINACION,
+  cantidad INT UNSIGNED,
+  UQ(id_arqueo, id_denominacion)
+)
+```
+
+El arqueo solo puede registrarse después de cerrar coherentemente la sesión.
+
+## 4. Stock derivado
+
+```text
+stock_fisico = SUM(LOTE_UBICACION.cantidad_actual)
+
+stock_disponible = SUM(cantidad_actual de lotes sin vencimiento
+                       o con fecha_vencimiento > CURRENT_DATE)
+
+stock_vencido = SUM(cantidad_actual de lotes
+                    con fecha_vencimiento <= CURRENT_DATE)
+```
+
+El vencimiento no elimina el registro ni reduce automáticamente el stock físico.
+
+## 5. FIFO y concurrencia
+
+`sp_registrar_venta` procesa presentaciones en orden estable y selecciona lotes vendibles mediante:
+
+```text
+ORDER BY COMPRA.fecha_hora, LOTE_PRODUCTO.id_lote,
+         LOTE_UBICACION.id_lote_ubicacion
+FOR UPDATE
+```
+
+Cada asignación se registra en `DETALLE_VENTA_LOTE`. Si falta stock, un pago no cuadra o cualquier validación falla, se revierte venta, detalles, trazabilidad, pagos y existencias.
+
+## 6. Anulación
+
+`sp_anular_venta` bloquea la venta y cada existencia utilizada, devuelve exactamente `DETALLE_VENTA_LOTE.cantidad_base`, marca la venta como `ANULADA` y conserva detalles, asignaciones y pagos. El trigger impide anular directamente sin ejecutar este flujo.
+
+## 7. Resumen físico V2
+
+- 21 tablas persistentes.
+- 23 claves foráneas.
+- 14 vistas.
+- 5 procedimientos operativos.
+- 21 triggers.
+- Cantidades en `DECIMAL(15,3)`.
+- Dinero en `DECIMAL(15,2)`; nunca `FLOAT`.
+
+El modelo permanece en 3FN; las rutinas agregan integridad transaccional sin duplicar hechos persistentes.

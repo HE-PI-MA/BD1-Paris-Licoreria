@@ -1,5 +1,5 @@
 -- ============================================================
--- PARÍS LICORERÍA
+-- PARÍS LICORERÍA V2
 -- DATOS INICIALES
 -- ============================================================
 
@@ -20,7 +20,8 @@ INSERT INTO unidad_medida (nombre, abreviatura)
 VALUES
 ('Unidad', 'und'),
 ('Kilogramo', 'kg'),
-('Gramo', 'g');
+('Gramo', 'g'),
+('Mililitro', 'ml');
 
 
 -- CATEGORÍAS

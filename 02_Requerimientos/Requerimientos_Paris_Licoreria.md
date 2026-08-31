@@ -629,11 +629,9 @@ Cuando exista una diferencia de caja debe poder registrarse una observación o e
 
 Durante el levantamiento de información se identificaron algunos aspectos que todavía requieren confirmación antes de considerarlos requerimientos definitivos.
 
-## 5.1 Pago mixto
+## 5.1 Pago mixto — resuelto en V2
 
-Debe confirmarse si el negocio utilizará ventas pagadas parcialmente en efectivo y parcialmente mediante QR.
-
-Si se confirma esta necesidad, se incorporará posteriormente un requerimiento funcional específico para registrar múltiples formas de pago dentro de una misma venta.
+Para la versión V2 se confirma el soporte de ventas pagadas parcialmente en efectivo y parcialmente mediante QR. Una venta puede registrar varios pagos y la suma debe coincidir exactamente con su total antes de confirmar la transacción.
 
 ## 5.2 Entrega de caja entre turnos
 

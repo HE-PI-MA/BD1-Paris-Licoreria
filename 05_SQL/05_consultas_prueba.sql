@@ -1,5 +1,5 @@
 -- ============================================================
--- PARÍS LICORERÍA
+-- PARÍS LICORERÍA V2
 -- CONSULTAS DE PRUEBA Y REPORTES
 -- ============================================================
 
@@ -46,7 +46,7 @@ ORDER BY producto;
 
 SELECT *
 FROM vw_productos_stock_bajo
-ORDER BY stock_actual ASC;
+ORDER BY stock_disponible ASC;
 
 
 -- ============================================================
@@ -63,8 +63,9 @@ ORDER BY producto, fecha_vencimiento, ubicacion;
 -- ============================================================
 
 SELECT *
-FROM vw_lotes_proximos_vencer
-WHERE fecha_vencimiento < CURDATE()
+FROM vw_stock_lote_ubicacion
+WHERE estado_vencimiento = 'VENCIDO'
+  AND stock_fisico > 0
 ORDER BY fecha_vencimiento;
 
 
@@ -74,8 +75,6 @@ ORDER BY fecha_vencimiento;
 
 SELECT *
 FROM vw_lotes_proximos_vencer
-WHERE fecha_vencimiento BETWEEN CURDATE()
-                            AND DATE_ADD(CURDATE(), INTERVAL 30 DAY)
 ORDER BY fecha_vencimiento;
 
 
@@ -153,7 +152,7 @@ WHERE estado = 'VIGENTE'
 
 SELECT *
 FROM vw_productos_mas_vendidos
-ORDER BY cantidad_vendida DESC;
+ORDER BY cantidad_base_vendida DESC;
 
 
 -- ============================================================
@@ -163,10 +162,11 @@ ORDER BY cantidad_vendida DESC;
 SELECT
     producto,
     nombre_presentacion,
-    cantidad_vendida,
+    cantidad_presentaciones,
+    cantidad_base_vendida,
     ingreso_generado
 FROM vw_productos_mas_vendidos
-ORDER BY cantidad_vendida DESC
+ORDER BY cantidad_base_vendida DESC
 LIMIT 10;
 
 
@@ -396,5 +396,5 @@ HAVING ABS(COALESCE(SUM(pg.monto), 0) - vt.total_venta) > 0.001;
 
 SELECT *
 FROM vw_stock_producto
-WHERE stock_actual = 0
+WHERE stock_disponible = 0
 ORDER BY producto;

@@ -1319,6 +1319,7 @@ No se crea todavía porque no se han definido turnos permanentes como registros 
 | SESION_CAJA           | id_sesion_caja    |
 | VENTA                 | id_venta          |
 | DETALLE_VENTA         | id_detalle_venta  |
+| DETALLE_VENTA_LOTE    | id_detalle_venta_lote |
 | PAGO                  | id_pago           |
 | DENOMINACION          | id_denominacion   |
 | ARQUEO_CAJA           | id_arqueo         |
@@ -1376,7 +1377,7 @@ Relación resuelta mediante:
 
 # 28. Conclusión
 
-Después de analizar la entrevista y los requerimientos se propone inicialmente un modelo compuesto por 20 entidades.
+Después de analizar la entrevista y los requerimientos se propone un modelo compuesto por 21 entidades.
 
 La nueva propuesta mejora varios aspectos del planteamiento inicial:
 
