@@ -3,19 +3,24 @@
 ## 1. Datos generales
 
 **Nombre del negocio:** París Licorería
-**Actividad principal:** Venta de bebidas alcohólicas y otros productos de consumo.
+**Actividad central:** VENTA DE PRODUCTOS: bebidas alcohólicas y otros productos de consumo.
 **Tiempo de funcionamiento:** Más de 4 años.
 **Cantidad aproximada de trabajadores:** Entre 2 y 3 personas.
 **Horario de atención:** Durante todo el día.
 **Cantidad de turnos:** Entre 2 y 3 turnos.
 **Persona entrevistada:** Dueña del negocio.
-**Fecha de la entrevista:** Pendiente de registrar.
+**Fecha de la entrevista original:** 20 de agosto de 2026.
+**Actualización del levantamiento:** 15 de septiembre de 2026.
+
+Esta versión integra las aclaraciones comunicadas por el responsable del proyecto durante la revisión de la entrevista. Las respuestas ampliadas no se presentan como una transcripción literal ni como información confirmada desde el 20 de agosto. La versión anterior se conserva en el historial del repositorio.
+
+Las aclaraciones comprenden pagos mixtos, responsabilidad por turno, entrega de dinero, ingreso de mercadería, cantidades por ubicación, lotes, moneda, precios históricos, anulaciones, diferencias de caja y conteo inicial. Los asuntos que todavía no tienen una respuesta suficiente se indican en la sección 28.
 
 ---
 
 ## 2. Objetivo de la entrevista
 
-Conocer cómo funciona actualmente París Licorería, identificar los procesos relacionados con productos, inventario, compras, ventas, pagos, caja y proveedores, y detectar las principales necesidades del negocio para posteriormente diseñar una base de datos que permita administrar esta información de manera organizada.
+Conocer cómo funciona París Licorería, identificar los problemas y necesidades relacionados con la venta de productos y sus procesos de apoyo, y fundamentar la revisión de la base de datos existente. Cada decisión de diseño debe responder a información del negocio, diferenciando las necesidades confirmadas de las pendientes.
 
 ---
 
@@ -352,7 +357,7 @@ Se utilizan principalmente:
 * Efectivo.
 * QR.
 
-También se ha considerado la posibilidad de manejar pagos combinados entre efectivo y QR.
+También se permiten pagos combinados entre efectivo y QR, según la aclaración posterior.
 
 ### Pregunta 43. ¿Qué ocurre cuando una venta se paga mediante QR?
 
@@ -364,7 +369,7 @@ Se desea que el sistema permita conservar una imagen del comprobante QR asociada
 ### Pregunta 44. ¿Podría una venta pagarse parcialmente en efectivo y parcialmente mediante QR?
 
 **Respuesta:**
-Esta alternativa ha sido considerada y deberá definirse definitivamente dentro de los requerimientos antes de diseñar el modelo final de pagos.
+Sí. Una misma venta puede pagarse parcialmente en efectivo y parcialmente mediante QR. Esta posibilidad, pendiente en el levantamiento original, queda confirmada en la actualización.
 
 ---
 
@@ -373,7 +378,7 @@ Esta alternativa ha sido considerada y deberá definirse definitivamente dentro 
 ### Pregunta 45. ¿Puede anularse una venta?
 
 **Respuesta:**
-Sí. Una venta puede necesitar ser anulada cuando exista un motivo válido.
+Sí. El encargado puede anular una venta de su propia sesión mientras su turno permanece abierto. La justificación es obligatoria. No se permiten anulaciones después del cierre del turno, según la aclaración recibida.
 
 ### Pregunta 46. ¿Qué situaciones podrían ocasionar la anulación?
 
@@ -458,6 +463,7 @@ Debe poder realizar actividades relacionadas con su turno, entre ellas:
 * Escanear productos.
 * Buscar productos manualmente.
 * Registrar formas de pago.
+* Anular ventas de su propia sesión durante el turno, con justificación obligatoria.
 * Cerrar su sesión de caja.
 * Realizar el arqueo.
 * Registrar diferencias cuando corresponda.
@@ -469,7 +475,9 @@ Debe poder realizar actividades relacionadas con su turno, entre ellas:
 ### Pregunta 52. ¿Cómo funciona la caja durante el día?
 
 **Respuesta:**
-Debido a que existen diferentes turnos, cada persona encargada debe hacerse responsable de la caja durante su período de trabajo.
+Cada encargado se hace responsable de la caja durante su turno. Los turnos se suceden: uno termina y luego comienza el siguiente; no se trabaja simultáneamente en los turnos descritos.
+
+La referencia posterior a dos o más cajas fue aclarada como una referencia a los turnos de los vendedores. No se confirmó que existan dos cajas físicas distintas ni su cantidad exacta. Esta información no permite justificar por sí sola una entidad independiente para cajas físicas.
 
 ### Pregunta 53. ¿Qué debería ocurrir al comenzar un turno?
 
@@ -547,7 +555,7 @@ Por ejemplo:
 **Respuesta:**
 Sí.
 
-Debe existir la posibilidad de guardar una observación o explicación relacionada con la diferencia encontrada durante el arqueo.
+Cuando el efectivo contado no coincide con el esperado, el encargado debe registrar obligatoriamente una explicación de la diferencia.
 
 ---
 
@@ -556,11 +564,9 @@ Debe existir la posibilidad de guardar una observación o explicación relaciona
 ### Pregunta 60. ¿Existe entrega de caja entre los encargados de diferentes turnos?
 
 **Respuesta:**
-Al finalizar un turno, la responsabilidad de la caja pasa al siguiente encargado.
+Al finalizar un turno, el dinero se entrega contado y se deja constancia de la entrega al siguiente encargado.
 
-Es necesario poder identificar qué sesión terminó y cuál comenzó posteriormente.
-
-La necesidad de registrar una entrega de caja como un proceso independiente deberá revisarse con mayor detalle antes de definir el modelo final de la base de datos.
+Se necesita registrar quién entrega, quién recibe y cuánto dinero se entrega, e identificar las sesiones correspondientes. La necesidad de conservar esta información queda confirmada. La forma de representarla en el modelo se revisará en la etapa correspondiente.
 
 ---
 
@@ -591,6 +597,68 @@ La dueña es quien revisa los cierres realizados por los encargados.
 
 ---
 
+## 22.1 Preguntas complementarias del levantamiento
+
+Las siguientes respuestas fueron comunicadas por el responsable del proyecto durante la actualización. Se mantiene la numeración original de las preguntas 1 a 62 para conservar sus referencias.
+
+### Pregunta 63. ¿La mercadería llega al momento de comprarla o se recibe después?
+
+**Respuesta:**
+La mercadería llega al momento de comprarla. No se confirmó una necesidad de registrar recepciones posteriores o entregas parciales.
+
+### Pregunta 64. ¿Toda la mercadería pasa primero por el almacén?
+
+**Respuesta:**
+Los productos pueden colocarse directamente en el almacén o en la heladera, según corresponda. No se indicó que deban pasar obligatoriamente por el almacén antes de ubicarse en otro lugar.
+
+### Pregunta 65. ¿Qué información se necesita controlar cuando los productos están en diferentes lugares?
+
+**Respuesta:**
+Se necesita conocer la cantidad existente en cada ubicación. No se requiere registrar quién realizó cada traslado. La operación debe mantener correctas las cantidades por ubicación.
+
+### Pregunta 66. ¿Una misma compra puede incluir un producto con diferentes lotes o vencimientos?
+
+**Respuesta:**
+Sí. Un mismo producto recibido en una compra puede pertenecer a distintos lotes o tener diferentes fechas de vencimiento.
+
+### Pregunta 67. ¿En qué moneda se registran las operaciones?
+
+**Respuesta:**
+Las compras, ventas y pagos se registran en bolivianos. La influencia del dólar sobre los precios, mencionada en la pregunta 29, no significa que se registren operaciones en dólares.
+
+### Pregunta 68. ¿Se necesita consultar todos los cambios anteriores de precios?
+
+**Respuesta:**
+No. Se necesita conservar el precio utilizado en cada venta. No se requiere un historial completo de cambios del precio vigente cuando no hubo ventas.
+
+### Pregunta 69. ¿Qué debe distinguirse si se anula una venta y el comprador ya se llevó los productos?
+
+**Respuesta:**
+Se solicita una opción para indicar si los productos regresaron o si el comprador se los llevó y no los devolvió. No debe suponerse que toda anulación implica el regreso físico de la mercadería.
+
+El tratamiento del dinero, la pérdida y las posibles devoluciones parciales en estos casos requiere una aclaración adicional; no queda definido únicamente con esta respuesta.
+
+### Pregunta 70. ¿Cómo se devuelve el dinero cuando se anula una venta pagada por QR?
+
+**Respuesta:**
+El dinero se devuelve por QR y se anula la venta dentro del turno. No se confirmó una devolución automática mediante una integración bancaria.
+
+La forma de devolver pagos en efectivo o mixtos y la constancia necesaria de cada devolución todavía deben aclararse.
+
+### Pregunta 71. ¿Durante el turno se retira o agrega efectivo por motivos distintos de las ventas?
+
+**Respuesta:**
+No. No se realizan retiros para compras u otros gastos ni ingresos adicionales de efectivo durante el turno. El monto inicial corresponde a la apertura y la entrega al siguiente encargado corresponde al cambio de turno.
+
+### Pregunta 72. ¿Cómo se registrará la mercadería existente al comenzar a utilizar el sistema?
+
+**Respuesta:**
+Se realizará un conteo inicial de la mercadería existente para registrarla en el sistema. No se confirmó una reconstrucción de todas sus compras anteriores.
+
+Este conteo se diferencia de las nuevas compras de mercadería. La disponibilidad de costos, datos de lote y antigüedad para ordenar estas existencias todavía debe aclararse; no se deben inventar compras anteriores para registrar el conteo.
+
+---
+
 # 23. Procesos actuales identificados
 
 A partir de la entrevista se identificaron los siguientes procesos principales del negocio:
@@ -600,8 +668,8 @@ A partir de la entrevista se identificaron los siguientes procesos principales d
 1. Se detecta que un producto se encuentra agotado o con poca existencia.
 2. La dueña decide realizar una reposición.
 3. Se contacta o compra a un distribuidor o empresa.
-4. Ingresa nueva mercadería.
-5. Los productos son ubicados dentro del negocio.
+4. La mercadería ingresa al momento de realizar la compra.
+5. Los productos son ubicados dentro del negocio, por ejemplo directamente en el almacén o la heladera.
 6. Se continúa vendiendo primero la mercadería anterior cuando existe stock previo.
 
 ## 23.2 Venta
@@ -620,8 +688,9 @@ La venta puede pagarse principalmente mediante:
 
 * Efectivo.
 * QR.
+* Una combinación de efectivo y QR.
 
-Cuando se utiliza QR existe un comprobante del pago.
+Las operaciones se registran en bolivianos. Cuando se utiliza QR existe un comprobante del pago.
 
 ## 23.4 Control de caja
 
@@ -629,8 +698,9 @@ Cuando se utiliza QR existe un comprobante del pago.
 2. Atiende y registra ventas durante su turno.
 3. Al finalizar cuenta el efectivo.
 4. Realiza el arqueo.
-5. Se determina si existe alguna diferencia.
-6. La dueña puede revisar posteriormente el cierre realizado.
+5. Se determina si existe alguna diferencia y se registra una explicación obligatoria cuando no coincide el dinero.
+6. Se deja constancia del dinero contado que se entrega, de quién entrega y de quién recibe al cambiar de turno.
+7. La dueña puede revisar posteriormente el cierre realizado.
 
 ## 23.5 Control de inventario
 
@@ -643,6 +713,10 @@ El negocio controla la disponibilidad de los productos y necesita detectar:
 * Salidas por ventas.
 * Productos dañados.
 * Productos vencidos.
+
+## 23.6 Conteo inicial para comenzar el registro digital
+
+Antes de comenzar a registrar las operaciones en el sistema, se realiza un conteo de la mercadería existente. Ese conteo establece la existencia inicial y se distingue de las compras realizadas posteriormente. Los datos necesarios y la forma de representarlo se revisarán sin inventar compras históricas.
 
 ---
 
@@ -687,14 +761,20 @@ Se identificaron las siguientes necesidades generales:
 * Registrar ventas.
 * Registrar los productos incluidos en cada venta.
 * Registrar pagos en efectivo y QR.
-* Evaluar definitivamente el manejo de pagos mixtos.
+* Registrar pagos mixtos de efectivo y QR.
 * Conservar comprobantes QR.
 * Permitir anulaciones sin eliminar el historial de la venta.
+* Limitar la anulación a las ventas de la sesión del encargado mientras su turno está abierto, con justificación obligatoria.
+* Distinguir si la mercadería regresó al anular una venta.
 * Registrar sesiones de caja por turno.
+* Conservar constancia de quién entrega el dinero, quién lo recibe y cuánto se entrega.
 * Realizar arqueos.
 * Registrar denominaciones de billetes y monedas.
 * Calcular diferencias de caja.
-* Registrar observaciones sobre diferencias.
+* Exigir una explicación cuando exista una diferencia de caja.
+* Registrar las existencias iniciales mediante un conteo.
+* Manejar compras, ventas y pagos en bolivianos.
+* Conservar el precio utilizado en cada venta.
 * Consultar información histórica.
 * Obtener reportes para apoyar la administración del negocio.
 
@@ -732,11 +812,11 @@ Durante la entrevista se identificaron las siguientes reglas:
 
 **RN14.** Las ventas pueden pagarse en efectivo o mediante QR.
 
-**RN15.** La utilización de pagos mixtos debe confirmarse antes de diseñar definitivamente el modelo de pagos.
+**RN15.** Una misma venta puede pagarse combinando efectivo y QR.
 
 **RN16.** Una venta anulada no debe eliminarse físicamente del registro.
 
-**RN17.** Toda anulación debe conservarar un motivo.
+**RN17.** Toda anulación debe conservar un motivo obligatorio. El encargado solo puede anular ventas de su propia sesión durante su turno abierto.
 
 **RN18.** La tienda no registra clientes.
 
@@ -748,13 +828,31 @@ Durante la entrevista se identificaron las siguientes reglas:
 
 **RN22.** El arqueo debe permitir contar las diferentes denominaciones de billetes y monedas.
 
-**RN23.** Si existe diferencia entre el efectivo esperado y el contado, dicha diferencia debe quedar registrada.
+**RN23.** Si existe diferencia entre el efectivo esperado y el contado, dicha diferencia debe quedar registrada junto con una explicación obligatoria.
+
+**RN24.** La entrega entre encargados debe dejar constancia de quién entrega, quién recibe y cuánto dinero se entrega.
+
+**RN25.** Las compras, ventas y pagos se registran en bolivianos.
+
+**RN26.** Cada venta conserva el precio aplicado en ese momento, aunque el precio vigente cambie posteriormente.
+
+**RN27.** La mercadería llega al momento de la compra y puede colocarse directamente en el almacén o la heladera.
+
+**RN28.** Una misma compra puede incluir distintos lotes o vencimientos de un mismo producto.
+
+**RN29.** El inicio del registro en el sistema se realiza mediante un conteo de la mercadería existente, separado de las nuevas compras.
+
+**RN30.** Al anular se debe distinguir si los productos regresaron. El tratamiento de la pérdida y del dinero cuando no regresan permanece pendiente de confirmación.
+
+**RN31.** No se realizan ingresos adicionales ni retiros de efectivo durante el turno por motivos distintos de las ventas; la apertura y la entrega entre turnos se registran por separado de esos cobros.
+
+**RN32.** Los encargados se suceden por turno; no se describió un funcionamiento simultáneo de los turnos.
 
 ---
 
-# 27. Alcance inicial del sistema
+# 27. Alcance identificado del sistema
 
-A partir de la entrevista, el sistema que se diseñe deberá enfocarse en la administración de:
+A partir de la entrevista y sus aclaraciones, el alcance comprende:
 
 * Usuarios.
 * Productos.
@@ -775,20 +873,26 @@ A partir de la entrevista, el sistema que se diseñe deberá enfocarse en la adm
 * Diferencias.
 * Reportes.
 
+También comprende el conteo inicial de mercadería, los pagos mixtos, la constancia de entrega de dinero entre turnos y la distinción del regreso de mercadería en las anulaciones. Registrar estas necesidades no significa que ya estén implementadas en la V2; deben contrastarse con requerimientos y modelo en las siguientes etapas de revisión.
+
 No se considera actualmente necesario registrar clientes ni gestionar cuentas por cobrar, debido a que el negocio realiza ventas directas y no trabaja con crédito o fiado.
 
 ---
 
 # 28. Aspectos pendientes de confirmar
 
-Antes de convertir la entrevista en requerimientos definitivos, quedan algunos aspectos que deben confirmarse si es necesario:
+Los pagos mixtos, la necesidad de dejar constancia de la entrega entre turnos, la conservación del precio aplicado en cada venta, la moneda, el conteo inicial y la fecha de la entrevista ya fueron aclarados. No deben seguir figurando como necesidades sin confirmar.
 
-1. Si se utilizarán definitivamente pagos mixtos de efectivo y QR.
-2. Cómo se realiza exactamente la entrega física del dinero entre un turno y el siguiente.
-3. Si será necesario registrar la entrega de caja como un proceso independiente.
-4. Si se desea guardar un historial completo de cambios de precios o únicamente el precio actual.
-5. La fecha exacta en la que se realizó la entrevista.
-6. Información adicional de identificación del negocio que pueda solicitar el docente.
+Los siguientes puntos **REQUIEREN CONFIRMACIÓN CON LA DUEÑA**:
+
+1. **Cajas físicas:** no se conoce su cantidad exacta ni si necesitan identificación propia. La mención a dos o más se aclaró como referencia a turnos.
+2. **Anulación sin regreso de mercadería:** cómo se trata la pérdida y qué sucede con el pago, especialmente cuando se detecta un billete falso después de que el comprador se fue.
+3. **Devoluciones de dinero:** cómo se devuelven pagos en efectivo o mixtos y qué constancia debe guardarse. Se indicó devolución por QR para ventas pagadas por QR.
+4. **Devoluciones parciales:** si existen y cómo se gestionan. No se deduce esta necesidad de una anulación completa.
+5. **Conteo inicial:** qué costos y datos de lote o vencimiento están disponibles y cómo se identifica la mercadería más antigua para comenzar a aplicar FIFO cuando no hay registro de sus compras anteriores.
+6. **Identificación adicional del negocio:** cualquier dato académico necesario que todavía no haya sido proporcionado.
+
+La elección de tablas, atributos o procedimientos para representar las necesidades confirmadas corresponde al análisis y diseño posterior; no se presenta como una respuesta de la dueña.
 
 ---
 
@@ -798,6 +902,8 @@ La entrevista permitió identificar que París Licorería actualmente realiza gr
 
 El negocio necesita organizar información relacionada con productos, compras, proveedores, inventario, ventas, pagos y caja.
 
-También se identificaron necesidades específicas relacionadas con el manejo de productos por peso, diferentes presentaciones, códigos de barras, lotes, vencimientos, stock mínimo, pagos QR, turnos y arqueos de caja.
+La actividad central es la venta de productos. Las compras, el ingreso y almacenamiento de mercadería, el inventario, los pagos y el control de caja permiten desarrollar y controlar esa actividad.
 
-La información obtenida durante esta etapa servirá como base para la siguiente fase del proyecto, en la cual las necesidades identificadas serán transformadas en requerimientos funcionales, no funcionales y reglas del sistema.
+La actualización confirma pagos mixtos, operaciones en bolivianos, conservación del precio aplicado en cada venta, anulaciones justificadas durante el turno, entrega de dinero con constancia y registro inicial de mercadería mediante conteo. También distingue los puntos que todavía requieren aclaración.
+
+La base V2 ya existe. Esta entrevista actualizada fundamenta su revisión por etapas, comenzando por la sistematización de las necesidades y su comparación con los requerimientos. No constituye una aprobación automática de cambios en las tablas ni del comportamiento actual del SQL.
